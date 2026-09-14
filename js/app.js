@@ -342,12 +342,17 @@
 
     const extraFields = Object.entries(item.extras || {}).map(([key, extra]) => {
       if (extra.type === "radio") {
-        return `<fieldset class="choice-row"><legend>${extra.label}</legend>${extra.options.map((o) =>
-          `<label class="chip"><input type="radio" name="${key}" value="${o.value || o.label}" ${o.checked ? "checked" : ""} /> ${o.label}</label>`
-        ).join("")}</fieldset>`;
+        return extra.options.map((o) =>
+          `<label class="toggle-extra">
+            <input type="radio" name="${key}" value="${o.value || o.label}" ${o.checked ? "checked" : ""} />
+            <span>${o.label}</span>
+          </label>`
+        ).join("");
       }
-      return `<label class="toggle-extra">${extra.label}${extra.hint ? ` <small class="muted">${extra.hint}</small>` : ""}
-        <input type="checkbox" name="${key}" ${extra.checked ? "checked" : ""} /></label>`;
+      return `<label class="toggle-extra">
+        <input type="checkbox" name="${key}" ${extra.checked ? "checked" : ""} />
+        <span>${extra.label}${extra.hint ? ` <small class="muted">${extra.hint}</small>` : ""}</span>
+      </label>`;
     }).join("");
 
     const unit = item.unit === "كيلو" || item.step ? "كيلو" : "كمية";
