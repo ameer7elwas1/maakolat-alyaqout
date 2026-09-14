@@ -535,7 +535,22 @@
     window.location.assign(url);
   }
 
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("yam-theme", theme);
+    const btn = document.getElementById("theme-toggle");
+    if (btn) btn.setAttribute("aria-label", theme === "dark" ? "الوضع الفاتح" : "الوضع المظلم");
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = theme === "dark" ? "#161012" : "#6B1220";
+  }
+
   function bind() {
+    applyTheme(localStorage.getItem("yam-theme") || "dark");
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+      const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      applyTheme(next);
+    });
+
     const cfg = window.SITE_CONFIG || {};
     document.getElementById("hours-text").textContent = cfg.hours || "";
     const phoneLink = document.getElementById("phone-link");
