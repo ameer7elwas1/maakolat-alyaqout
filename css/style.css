@@ -245,7 +245,7 @@ h1 span { color: var(--ruby); }
 .trust-bar { padding: 10px 0 30px; }
 .trust-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 .trust-row div {
