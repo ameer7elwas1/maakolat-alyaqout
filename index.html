@@ -1,374 +1,201 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الأقساط - مجموعة رسول الرحمة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        * {
-            font-family: 'Cairo', sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #048267 0%, #14b8a6 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-        .login-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-            max-width: 450px;
-            width: 100%;
-            position: relative;
-            z-index: 1;
-        }
-        .login-header {
-            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .login-header::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            top: -50%;
-            right: -50%;
-        }
-        .login-header h1, .login-header p {
-            position: relative;
-            z-index: 1;
-        }
-        .login-header h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 700;
-        }
-        .login-header p {
-            margin: 10px 0 0;
-            opacity: 0.9;
-        }
-        .login-body {
-            padding: 40px;
-        }
-        .form-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        .form-control {
-            border-radius: 10px;
-            border: 2px solid #e0e0e0;
-            padding: 12px 15px;
-            transition: all 0.3s;
-        }
-        .form-control:focus {
-            border-color: #0f766e;
-            box-shadow: 0 0 0 0.2rem rgba(15, 118, 110, 0.25);
-        }
-        .btn-login {
-            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
-            border: none;
-            border-radius: 10px;
-            padding: 12px;
-            font-weight: 600;
-            font-size: 16px;
-            color: white;
-            width: 100%;
-            transition: transform 0.2s;
-        }
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(15, 118, 110, 0.4);
-            background: linear-gradient(135deg, #0d6359 0%, #0f9d8e 100%);
-        }
-        .alert {
-            border-radius: 10px;
-            border: none;
-        }
-        .loading {
-            display: none;
-        }
-        .loading.show {
-            display: inline-block;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#6B1220" />
+  <title>مأكولات الياقوت والمرجان | اطلب أطيب الأكلات البيتية</title>
+  <meta name="description" content="مأكولات الياقوت والمرجان — كبة، دولمة، معجنات وحلويات بيتية. اطلب أونلاين ويصلك الطلب مباشرة على واتساب." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect rx='14' width='64' height='64' fill='%236B1220'/%3E%3Ccircle cx='26' cy='30' r='10' fill='%23C9A227'/%3E%3Ccircle cx='40' cy='36' r='9' fill='%23D46A4C'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <h1><i class="bi bi-mortarboard-fill"></i> مجموعة رسول الرحمة</h1>
-            <p>نظام إدارة الأقساط</p>
-        </div>
-        <div class="login-body">
-            <div id="alertContainer"></div>
-            <form id="loginForm">
-                <div class="mb-3">
-                    <label for="username" class="form-label">اسم المستخدم</label>
-                    <input type="text" class="form-control" id="username" required autocomplete="username">
-                </div>
-                <div class="mb-4">
-                    <label for="password" class="form-label">كلمة المرور</label>
-                    <input type="password" class="form-control" id="password" required autocomplete="current-password">
-                </div>
-                <button type="submit" class="btn btn-login">
-                    <span class="loading spinner-border spinner-border-sm me-2" role="status"></span>
-                    تسجيل الدخول
-                </button>
-            </form>
-        </div>
+  <div class="page-bg" aria-hidden="true"></div>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">
+          <span class="gem gem-ruby"></span>
+          <span class="gem gem-coral"></span>
+        </span>
+        <span class="brand-text">
+          <strong>الياقوت والمرجان</strong>
+          <small>مأكولات بيتية فاخرة</small>
+        </span>
+      </a>
+
+      <nav class="header-nav" aria-label="التنقل الرئيسي">
+        <a href="#menu">القائمة</a>
+        <a href="#about">من نحن</a>
+        <a href="#contact">تواصل</a>
+      </nav>
+
+      <button class="cart-btn" id="open-cart" type="button" aria-label="فتح السلة">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path fill="currentColor" d="M7 4h-2l-1 2v2h2l3.6 7.59-1.35 2.41A1 1 0 0 0 9 20h12v-2h-11.42a.25.25 0 0 1-.23-.37L10.1 16h7.45a2 2 0 0 0 1.79-1.11L22 9H6.21l-.94-2H21V5H7.4zM9 21a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+        </svg>
+        <span>السلة</span>
+        <span class="cart-count" id="cart-count">0</span>
+      </button>
     </div>
+  </header>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script src="utils.js?v=20250127"></script>
-    <script>
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">ضيافة عراقية بطعم البيت</p>
+          <h1>مأكولات <span>الياقوت</span> والمرجان</h1>
+          <p class="hero-lead">كبة، دولمة، معجنات وحلويات تتحضّر بعناية. اختَر صنفك، حدّد الإضافات، وأرسل الطلب مباشرة إلى واتسابنا.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#menu">اطلب من القائمة</a>
+            <a class="btn btn-ghost" href="#about">من نحن</a>
+          </div>
+          <ul class="hero-points">
+            <li>إضافات لكل صنف: ملح، سفرة، طرشي</li>
+            <li>إرسال فوري عبر واتساب</li>
+            <li>طلب سهل خلال أقل من دقيقة</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-        const supabaseUrl = CONFIG?.SUPABASE?.URL || 'https://vpvvjascwgivdjyyhzwp.supabase.co';
-        const supabaseKey = CONFIG?.SUPABASE?.ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwdnZqYXNjd2dpdmRqeXloendwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk4MDYxMjYsImV4cCI6MjA2NTM4MjEyNn0.6AR2-MG4x9ugNTXe9jUqx-IwGEtj1m6MCYwQkTsSbUQ';
+    <section class="trust-bar">
+      <div class="container trust-row">
+        <div><strong>تحضير يومي</strong><span>مكونات طازجة</span></div>
+        <div><strong>حسب ذوقك</strong><span>ملح وسفرة وطرشي</span></div>
+        <div><strong>طلب واتساب</strong><span>بدون تسجيل حساب</span></div>
+        <div><strong>حلويات ومعجنات</strong><span>للبيت والمناسبات</span></div>
+      </div>
+    </section>
 
-        if (!supabaseKey) {
-            console.error('خطأ: ANON_KEY غير موجود في config.js');
-            alert('خطأ في الإعدادات: يرجى التحقق من ملف config.js');
-        }
+    <section class="menu-section" id="menu">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">MENU</p>
+          <h2>قائمة المأكولات</h2>
+          <p>اضغط على الصنف، اختر الكمية والإضافات، ثم أضفه إلى السلة.</p>
+        </header>
 
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        <div class="cat-scroll" id="category-bar" role="tablist" aria-label="تصنيفات القائمة"></div>
+        <div class="menu-grid" id="menu-grid"></div>
+      </div>
+    </section>
 
-        let loginAttempts = 0;
-        const maxAttempts = CONFIG.SECURITY.MAX_LOGIN_ATTEMPTS;
+    <section class="about-section" id="about">
+      <div class="container about-grid">
+        <div>
+          <p class="eyebrow">قصتنا</p>
+          <h2>أكل بيت، بهيبة المناسبات</h2>
+          <p>من الكبة الموصليّة والدولمة إلى الكليجة والقطايف، نحضّر أكلات تناسب السفرة اليومية والعزائم. كل طلب يصلنا مرتباً على واتساب مع ملاحظاتك: ملح قليل أو زيادة، سفرة، وطرشي.</p>
+          <ul class="about-list">
+            <li>تجهيز للصواني والعزائم</li>
+            <li>حلويات بالكيلو حسب طلبك</li>
+            <li>قوزي وسمك شوي حسب الكمية</li>
+          </ul>
+        </div>
+        <aside class="hours-card" id="contact">
+          <h3>اطلب الآن</h3>
+          <p id="hours-text"></p>
+          <p class="muted">بعد إتمام السلة ننقلك مباشرة إلى واتساب المأكولات والطلب مكتوب تلقائياً.</p>
+          <button class="btn btn-primary" id="open-cart-2" type="button">متابعة الطلب</button>
+        </aside>
+      </div>
+    </section>
+  </main>
 
-        function showAlert(message, type = 'danger') {
-            const alertContainer = document.getElementById('alertContainer');
-            alertContainer.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-            setTimeout(() => {
-                const alert = alertContainer.querySelector('.alert');
-                if (alert) {
-                    alert.classList.remove('show');
-                    setTimeout(() => alert.remove(), 300);
-                }
-            }, 5000);
-        }
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="brand brand-footer">
+        <span class="brand-mark" aria-hidden="true">
+          <span class="gem gem-ruby"></span>
+          <span class="gem gem-coral"></span>
+        </span>
+        <span class="brand-text">
+          <strong>مأكولات الياقوت والمرجان</strong>
+          <small>طلب سهل · توصيل عبر واتساب</small>
+        </span>
+      </div>
+      <p>جميع الأسعار بالدينار العراقي. الأصناف ذات السعر «حسب الكمية» تُحدَّد عند تأكيد الطلب.</p>
+    </div>
+  </footer>
 
-        async function hashPassword(password) {
+  <div class="mobile-bar" id="mobile-bar" hidden>
+    <div>
+      <span>المجموع</span>
+      <strong id="mobile-total">0 د.ع</strong>
+    </div>
+    <button class="btn btn-primary" id="mobile-open-cart" type="button">عرض السلة</button>
+  </div>
 
-            return password; 
-        }
+  <div class="overlay" id="overlay" hidden></div>
 
-        async function verifyPassword(password, hash) {
-            if (!password || !hash) {
-                console.error('Password or hash is missing');
-                return false;
-            }
+  <aside class="drawer" id="cart-drawer" aria-hidden="true" aria-labelledby="cart-title">
+    <div class="drawer-head">
+      <h2 id="cart-title">سلتك</h2>
+      <button class="icon-btn" id="close-cart" type="button" aria-label="إغلاق السلة">×</button>
+    </div>
+    <div class="drawer-body" id="cart-items"></div>
+    <div class="drawer-foot">
+      <div class="total-row">
+        <span>المجموع</span>
+        <strong id="cart-total">0 د.ع</strong>
+      </div>
+      <button class="btn btn-primary btn-block" id="go-checkout" type="button">إتمام الطلب</button>
+    </div>
+  </aside>
 
-            try {
-                const response = await supabase.rpc('verify_password', {
-                    password: password,
-                    hash: hash
-                });
+  <div class="modal" id="item-modal" aria-hidden="true" role="dialog" aria-labelledby="item-modal-title">
+    <div class="modal-card">
+      <button class="icon-btn modal-close" id="close-item" type="button" aria-label="إغلاق">×</button>
+      <div class="modal-hero" id="item-hero"></div>
+      <div class="modal-body">
+        <h2 id="item-modal-title"></h2>
+        <p class="muted" id="item-modal-desc"></p>
+        <form id="item-form"></form>
+      </div>
+    </div>
+  </div>
 
-                if (response.error) {
-                    console.warn('RPC verify_password failed, using fallback:', response.error);
+  <div class="modal" id="checkout-modal" aria-hidden="true" role="dialog" aria-labelledby="checkout-title">
+    <div class="modal-card checkout-card">
+      <button class="icon-btn modal-close" id="close-checkout" type="button" aria-label="إغلاق">×</button>
+      <div class="modal-body">
+        <p class="eyebrow">الخطوة الأخيرة</p>
+        <h2 id="checkout-title">بيانات الطلب</h2>
+        <p class="muted">نكتب طلبك تلقائياً ونفتح واتساب المأكولات لإرساله.</p>
+        <form id="checkout-form">
+          <label>الاسم الكامل
+            <input name="name" type="text" required autocomplete="name" placeholder="اسمك الكريم" />
+          </label>
+          <label>رقم الهاتف
+            <input name="phone" type="tel" required autocomplete="tel" inputmode="tel" placeholder="07xx xxx xxxx" />
+          </label>
+          <label>العنوان
+            <input name="address" type="text" required autocomplete="street-address" placeholder="المنطقة، أقرب نقطة دالة" />
+          </label>
+          <fieldset class="choice-row">
+            <legend>طريقة الاستلام</legend>
+            <label class="chip"><input type="radio" name="fulfillment" value="توصيل" checked /> توصيل</label>
+            <label class="chip"><input type="radio" name="fulfillment" value="استلام" /> استلام من المحل</label>
+          </fieldset>
+          <label>ملاحظات عامة
+            <textarea name="notes" rows="3" placeholder="وقت التوصيل، تعليمات إضافية..."></textarea>
+          </label>
+          <div class="checkout-summary" id="checkout-summary"></div>
+          <button class="btn btn-primary btn-block" type="submit">إرسال الطلب عبر واتساب</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
-                    return password === hash;
-                }
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-                return response.data === true;
-            } catch (error) {
-                console.error('Error in verifyPassword:', error);
-
-                return password === hash;
-            }
-        }
-
-        async function login(username, password) {
-            try {
-                const trimmedUsername = username.toLowerCase().trim();
-                console.log('Attempting login for username:', trimmedUsername);
-
-                const { data: user, error: fetchError } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('username', trimmedUsername)
-                    .eq('is_active', true)
-                    .single();
-
-                if (fetchError) {
-                    console.error('Error fetching user:', fetchError);
-                    loginAttempts++;
-                    if (loginAttempts >= maxAttempts) {
-                        showAlert('تم تجاوز عدد محاولات الدخول المسموح بها. يرجى المحاولة لاحقاً.', 'danger');
-                        return false;
-                    }
-                    showAlert('اسم المستخدم أو كلمة المرور غير صحيحة', 'danger');
-                    return false;
-                }
-
-                if (!user) {
-                    console.error('User not found:', trimmedUsername);
-                    loginAttempts++;
-                    if (loginAttempts >= maxAttempts) {
-                        showAlert('تم تجاوز عدد محاولات الدخول المسموح بها. يرجى المحاولة لاحقاً.', 'danger');
-                        return false;
-                    }
-                    showAlert('اسم المستخدم أو كلمة المرور غير صحيحة', 'danger');
-                    return false;
-                }
-
-                console.log('User found, verifying password...');
-                const isValid = await verifyPassword(password, user.password_hash);
-                console.log('Password verification result:', isValid);
-
-                if (!isValid) {
-                    console.warn('Invalid password for user:', trimmedUsername);
-                    loginAttempts++;
-                    if (loginAttempts >= maxAttempts) {
-                        showAlert('تم تجاوز عدد محاولات الدخول المسموح بها. يرجى المحاولة لاحقاً.', 'danger');
-                        return false;
-                    }
-                    showAlert('اسم المستخدم أو كلمة المرور غير صحيحة', 'danger');
-                    return false;
-                }
-
-                let schoolName = null;
-                if (user.school_id) {
-                    try {
-                        const { data: school, error: schoolError } = await supabase
-                            .from('schools')
-                            .select('id, name')
-                            .eq('id', user.school_id)
-                            .single();
-
-                        if (!schoolError && school) {
-                            schoolName = school.name;
-                        }
-                    } catch (error) {
-                        console.warn('Could not fetch school data:', error);
-                    }
-                }
-
-                if (user.locked_until && new Date(user.locked_until) > new Date()) {
-                    const lockTime = Math.ceil((new Date(user.locked_until) - new Date()) / 60000);
-                    showAlert(`الحساب مقفل. يرجى المحاولة بعد ${lockTime} دقيقة`, 'warning');
-                    return false;
-                }
-
-                console.log('Login successful, updating user data...');
-
-                await supabase
-                    .from('users')
-                    .update({
-                        last_login: new Date().toISOString(),
-                        login_count: (user.login_count || 0) + 1,
-                        failed_login_attempts: 0,
-                        locked_until: null
-                    })
-                    .eq('id', user.id);
-
-                const userData = {
-                    id: user.id,
-                    username: user.username,
-                    full_name: user.full_name,
-                    role: user.role,
-                    is_admin: user.is_admin,
-                    school_id: user.school_id,
-                    school_name: schoolName
-                };
-
-                localStorage.setItem('user', JSON.stringify(userData));
-                localStorage.setItem('loginTime', new Date().toISOString());
-
-                loginAttempts = 0;
-
-                console.log('Redirecting user...', userData);
-
-                if (user.is_admin || user.role === 'admin') {
-                    window.location.href = 'admin-dashboard.html';
-                } else if (user.school_id) {
-                    window.location.href = `school-dashboard.html?school=${user.school_id}`;
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
-
-                return true;
-            } catch (error) {
-                console.error('خطأ في تسجيل الدخول:', error);
-                showAlert('حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.', 'danger');
-                return false;
-            }
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const loading = submitBtn.querySelector('.loading');
-
-            if (!username || !password) {
-                showAlert('يرجى إدخال اسم المستخدم وكلمة المرور', 'warning');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            loading.classList.add('show');
-
-            await login(username, password);
-
-            submitBtn.disabled = false;
-            loading.classList.remove('show');
-        });
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const userData = localStorage.getItem('user');
-            const loginTime = localStorage.getItem('loginTime');
-
-            if (userData && loginTime) {
-                const loginDate = new Date(loginTime);
-                const now = new Date();
-                const sessionTimeout = CONFIG?.SECURITY?.SESSION_TIMEOUT || 24 * 60 * 60 * 1000;
-
-                if (now - loginDate < sessionTimeout) {
-                    const user = JSON.parse(userData);
-                    if (user.is_admin || user.role === 'admin') {
-                        window.location.href = 'admin-dashboard.html';
-                    } else if (user.school_id) {
-                        window.location.href = `school-dashboard.html?school=${user.school_id}`;
-                    }
-                } else {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('loginTime');
-                }
-            }
-        });
-    </script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
