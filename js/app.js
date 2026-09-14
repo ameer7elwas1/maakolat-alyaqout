@@ -49,7 +49,7 @@
       desc: "تشكيلة 50 قطعة، مناسبة للضيافة.",
       price: 35000,
       unit: "50 قطعة",
-      image: "#8d2434 url('https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=80') center/cover",
+      image: "assets/pastry-mix.jpg",
       extras: extrasSavory
     },
     {
@@ -59,7 +59,7 @@
       desc: "50 قطعة مشكلة من كبة التمن والبورك والسمبوسة.",
       price: 35000,
       unit: "50 قطعة",
-      image: "linear-gradient(160deg,#3f0b14,#c9a227)",
+      image: "assets/kibbeh-mix.jpg",
       extras: extrasSavory
     },
     {
@@ -69,7 +69,7 @@
       desc: "كبة حلبية مقرمشة.",
       price: 10000,
       unit: "15 قطعة",
-      image: "linear-gradient(160deg,#6b1220,#d46a4c)",
+      image: "assets/kibbeh-halabi.jpg",
       extras: extrasSavory
     },
     {
@@ -79,7 +79,7 @@
       desc: "كبة موصلية هلالية.",
       price: 15000,
       unit: "10 قطع",
-      image: "linear-gradient(160deg,#4a1d10,#c9a227)",
+      image: "assets/kibbeh-mosul.jpg",
       extras: extrasSavory
     },
     {
@@ -87,7 +87,7 @@
       category: "kibbeh",
       name: "كبة برغل",
       desc: "اختَر الحجم المناسب لك.",
-      image: "linear-gradient(160deg,#7a2e12,#6b1220)",
+      image: "assets/kibbeh-burghul.jpg",
       extras: extrasSavory,
       variants: [
         { id: "double", label: "دبل — 7 قطع", price: 10000 },
@@ -101,7 +101,7 @@
       desc: "طبق رئيسي جاهز للسفرة.",
       price: 20000,
       unit: "صينية",
-      image: "#8a4b12 url('https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=900&q=80') center/cover",
+      image: "assets/kabsa.jpg",
       extras: extrasGrill
     },
     {
@@ -109,7 +109,7 @@
       category: "mains",
       name: "صينية الدجاج",
       desc: "مع الملحقات: طرشي وخضرة وتتبيلة الدجاج.",
-      image: "linear-gradient(160deg,#6b1220,#d46a4c)",
+      image: "assets/chicken-tray.jpg",
       extras: {
         salt: extrasSavory.salt,
         sofra: extrasSavory.sofra,
@@ -125,7 +125,7 @@
       category: "dolma",
       name: "جدر دولمة",
       desc: "دولمة بيتية على ثلاث أحجام.",
-      image: "linear-gradient(160deg,#355e3b,#c9a227)",
+      image: "assets/dolma.jpg",
       extras: extrasSavory,
       variants: [
         { id: "large", label: "الحجم الكبير", price: 25000 },
@@ -141,7 +141,7 @@
       price: 12000,
       unit: "كيلو",
       step: 0.5,
-      image: "linear-gradient(160deg,#7a4b16,#c9a227)",
+      image: "assets/kleija-ghee.jpg",
       extras: extrasSweet
     },
     {
@@ -152,7 +152,7 @@
       price: 15000,
       unit: "كيلو",
       step: 0.5,
-      image: "linear-gradient(160deg,#5b3310,#d46a4c)",
+      image: "assets/kleija-walnut.jpg",
       extras: extrasSweet
     },
     {
@@ -163,7 +163,7 @@
       price: 7000,
       unit: "كيلو",
       step: 0.5,
-      image: "linear-gradient(160deg,#8d6a3a,#f6efe2)",
+      image: "assets/kleija-plain.jpg",
       extras: extrasSweet
     },
     {
@@ -173,7 +173,7 @@
       desc: "اختَر بالقطر أو بالعسل، السعر للكيلو.",
       unit: "كيلو",
       step: 0.5,
-      image: "linear-gradient(160deg,#c9a227,#6b1220)",
+      image: "assets/basbousa.jpg",
       extras: extrasSweet,
       variants: [
         { id: "qater", label: "بالقطر — الكيلو", price: 10000 },
@@ -187,7 +187,7 @@
       desc: "قالب كبير.",
       price: 7000,
       unit: "قالب كبير",
-      image: "linear-gradient(160deg,#d46a4c,#f6efe2)",
+      image: "assets/cake-plain.jpg",
       extras: extrasSweet
     },
     {
@@ -195,7 +195,7 @@
       category: "sweets",
       name: "كيك الطبقات",
       desc: "حسب عدد الطبقات من 3 إلى 10 آلاف.",
-      image: "linear-gradient(160deg,#6b1220,#e7d7a0)",
+      image: "assets/cake-layer.jpg",
       extras: extrasSweet,
       variants: [
         { id: "c3", label: "طبقات خفيفة — 3,000 د.ع", price: 3000 },
@@ -211,7 +211,7 @@
       desc: "10 قطع.",
       price: 8000,
       unit: "10 قطع",
-      image: "linear-gradient(160deg,#b8572a,#c9a227)",
+      image: "assets/qatayef.jpg",
       extras: extrasSweet
     },
     {
@@ -220,7 +220,7 @@
       name: "سمك شوي",
       desc: "مع التمن الأحمر والطرشي. السعر حسب الكمية.",
       price: null,
-      image: "linear-gradient(160deg,#1f4e5f,#c9a227)",
+      image: "assets/grilled-fish.jpg",
       extras: extrasGrill
     },
     {
@@ -229,7 +229,7 @@
       name: "قوزي لحم",
       desc: "حسب الكمية المطلوبة للمناسبة.",
       price: null,
-      image: "linear-gradient(160deg,#3f0b14,#c9a227)",
+      image: "assets/qouzi.jpg",
       extras: extrasSavory
     }
   ];
@@ -289,7 +289,8 @@
     const items = menu.filter((i) => currentCategory === "all" || i.category === currentCategory);
     els.grid.innerHTML = items.map((item) => `
       <article class="dish-card">
-        <div class="dish-photo" style="background:${item.image}">
+        <div class="dish-photo">
+          <img src="${item.image}" alt="${item.name}">
           <span class="dish-badge">${item.unit || (item.variants ? "عدة أحجام" : "حسب الطلب")}</span>
         </div>
         <div class="dish-body">
@@ -372,7 +373,9 @@
     activeItem = item;
     els.itemTitle.textContent = item.name;
     els.itemDesc.textContent = item.desc;
-    els.itemHero.style.background = item.image;
+    els.itemHero.style.backgroundImage = `url("${item.image}")`;
+    els.itemHero.style.backgroundSize = "cover";
+    els.itemHero.style.backgroundPosition = "center";
     renderItemForm(item);
     els.itemModal.classList.add("open");
     els.itemModal.setAttribute("aria-hidden", "false");
