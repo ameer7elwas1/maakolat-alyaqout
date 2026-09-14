@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect rx='14' width='64' height='64' fill='%236B1220'/%3E%3Ccircle cx='26' cy='30' r='10' fill='%23C9A227'/%3E%3Ccircle cx='40' cy='36' r='9' fill='%23D46A4C'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="css/style.css?v=4" />
+  <link rel="stylesheet" href="css/style.css?v=5" />
 </head>
 <body>
   <div class="page-bg" aria-hidden="true"></div>
@@ -178,6 +178,15 @@
           <label>العنوان
             <input name="address" type="text" required autocomplete="street-address" placeholder="المنطقة، أقرب نقطة دالة" />
           </label>
+          <div class="location-box" id="location-box">
+            <div class="location-head">
+              <strong>موقع الزبون على الخريطة</strong>
+              <span class="location-status" id="location-status">لم يُحدَّد بعد</span>
+            </div>
+            <p class="muted location-hint">نحدد موقعك بالـ GPS ونرسل للمطعم رابط خريطة مع الطلب حتى يصل التوصيل بدقة.</p>
+            <button class="btn btn-ghost btn-block" id="share-location" type="button">تحديد موقعي الآن</button>
+            <a class="location-preview" id="location-preview" href="#" target="_blank" rel="noopener">عرض الموقع على الخريطة</a>
+          </div>
           <fieldset class="choice-row">
             <legend>طريقة الاستلام</legend>
             <label class="chip"><input type="radio" name="fulfillment" value="توصيل" checked /> توصيل</label>
@@ -194,7 +203,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/config.js?v=4"></script>
-  <script src="js/app.js?v=4"></script>
+  <script src="js/config.js?v=5"></script>
+  <script src="js/app.js?v=5"></script>
 </body>
 </html>

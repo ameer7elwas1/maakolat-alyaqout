@@ -539,6 +539,33 @@ input[type="text"], input[type="tel"], textarea, select {
   color: var(--muted);
 }
 .muted { color: var(--muted); }
+.location-box {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.location-box.is-set { border-color: var(--ruby); }
+.location-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.location-status { font-size: 0.86rem; font-weight: 700; color: var(--muted); }
+.location-status.ok { color: var(--ruby); }
+.location-status.err { color: var(--coral); }
+.location-hint { margin: 0 0 10px; font-size: 0.86rem; font-weight: 500; }
+.location-preview {
+  display: none;
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--ruby);
+}
+.location-preview.is-visible { display: block; }
 
 .toast {
   position: fixed;
