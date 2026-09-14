@@ -5,15 +5,6 @@
   };
 
   const extrasSavory = {
-    salt: {
-      type: "radio",
-      label: "الملح",
-      options: [
-        { label: "ملح قليل", value: "قليل" },
-        { label: "ملح عادي", value: "عادي", checked: true },
-        { label: "ملح زيادة", value: "زيادة" }
-      ]
-    },
     sofra: { type: "toggle", label: "سفرة", hint: "تجهيز للسفرة والتقديم" },
     pickles: { type: "toggle", label: "طرشي" }
   };
@@ -24,7 +15,6 @@
   };
 
   const extrasGrill = {
-    salt: extrasSavory.salt,
     sofra: extrasSavory.sofra,
     pickles: extrasSavory.pickles,
     rice: { type: "toggle", label: "تمن أحمر", checked: true },
@@ -111,7 +101,6 @@
       desc: "مع الملحقات: طرشي وخضرة وتتبيلة الدجاج.",
       image: "assets/chicken-tray.jpg",
       extras: {
-        salt: extrasSavory.salt,
         sofra: extrasSavory.sofra,
         extraPickles: { type: "toggle", label: "طرشي إضافي" }
       },
