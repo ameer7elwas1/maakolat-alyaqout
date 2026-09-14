@@ -291,7 +291,7 @@
           <h3>${item.name}</h3>
           <p>${item.desc}</p>
           <div class="price">${priceLabel(item)}</div>
-          <button class="btn btn-primary" data-add="${item.id}" type="button">أضف للسلة مع الإضافات</button>
+          <button class="btn btn-primary" data-add="${item.id}" type="button">أضف للسلة</button>
         </div>
       </article>
     `).join("");
