@@ -4,7 +4,8 @@
 */
 window.SITE_CONFIG = {
   businessName: "مأكولات الياقوت والمرجان",
-  whatsapp: "9647700000000",
+  whatsapp: "9647869789710",
+  phoneDisplay: "0786 978 9710",
   city: "العراق",
   hours: "يومياً من 9 صباحاً حتى 10 مساءً"
 };

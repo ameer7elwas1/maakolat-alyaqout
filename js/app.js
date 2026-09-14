@@ -362,7 +362,7 @@
       </div>
       ${extraFields}
       <label>ملاحظات على هذا الصنف
-        <textarea name="note" rows="2" placeholder="مثال: بدون بصل، توصيل الساعة 7..."></textarea>
+        <textarea name="note" rows="2" placeholder="مثال: توصيل الساعة 7..."></textarea>
       </label>
       <button class="btn btn-primary btn-block" type="submit">إضافة إلى السلة</button>
     `;
@@ -536,7 +536,14 @@
   }
 
   function bind() {
-    document.getElementById("hours-text").textContent = (window.SITE_CONFIG || {}).hours || "";
+    const cfg = window.SITE_CONFIG || {};
+    document.getElementById("hours-text").textContent = cfg.hours || "";
+    const phoneLink = document.getElementById("phone-link");
+    if (phoneLink && cfg.whatsapp) {
+      const digits = String(cfg.whatsapp).replace(/[^\d]/g, "");
+      phoneLink.href = `https://wa.me/${digits}`;
+      phoneLink.textContent = cfg.phoneDisplay || "07869789710";
+    }
 
     els.cats.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-id]");

@@ -311,6 +311,13 @@ h1 span { color: var(--ruby); }
 }
 .hours-card .muted { color: #e7d7a0; }
 .hours-card .btn-primary { background: var(--gold); color: var(--ruby-deep); }
+.hours-card #phone-link {
+  color: var(--gold-soft);
+  font-weight: 800;
+  font-size: 1.15rem;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
 
 .site-footer {
   border-top: 1px solid var(--line);
