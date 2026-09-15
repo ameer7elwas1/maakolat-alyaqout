@@ -252,13 +252,12 @@
     },
     {
       "id": "grilled-fish",
+      "category": "special",
       "name": "سمك شوي",
       "desc": "مع التمن الأحمر والطرشي. السعر حسب الكمية.",
-      "category": "special",
-      "extrasKey": "grill",
+      "price": null,
       "image": "assets/grilled-fish.jpg",
-      "unit": "",
-      "price": null
+      "extrasKey": "grill"
     },
     {
       "id": "qouzi",
@@ -278,6 +277,37 @@
       "image": "assets/uploads/dish-1789491571122.jpg?v=1789492215798",
       "unit": "",
       "price": 500
+    },
+    {
+      "id": "dish-1789484692249",
+      "name": "admin",
+      "desc": "admin",
+      "category": "sweets",
+      "extrasKey": "chicken",
+      "image": "assets/pastry-mix.jpg",
+      "unit": "",
+      "variants": [
+        {
+          "id": "v1",
+          "label": "1",
+          "price": 22000
+        },
+        {
+          "id": "v2",
+          "label": "2",
+          "price": 33000
+        }
+      ]
+    },
+    {
+      "id": "dish-1789486426354",
+      "name": "مطبك نوم وعجز",
+      "desc": "مابية حيل نعسانه",
+      "category": "mains",
+      "extrasKey": "grill",
+      "image": "assets/uploads/dish-1789486426354.jpg?v=1789499613544",
+      "unit": "",
+      "price": null
     }
   ],
   "assets": [
@@ -299,5 +329,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789492213781
+  "updatedAt": 1789499611063
 }
