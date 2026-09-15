@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#161012" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>إدارة القائمة | الياقوت والمرجان</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    (function () {
+      var theme = localStorage.getItem("yam-theme") || "dark";
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css?v=12" />
+</head>
+<body class="admin-page">
+  <div class="page-bg" aria-hidden="true"></div>
+
+  <section class="admin-login" id="login-screen">
+    <div class="admin-login-card">
+      <p class="eyebrow">لوحة التحكم</p>
+      <h1>إدارة الأصناف</h1>
+      <p class="muted">هذه الصفحة للمسؤول فقط. أدخل رمز الدخول لإضافة صنف أو تعديل الأسعار.</p>
+      <form id="login-form">
+        <label>رمز الدخول
+          <input name="pin" type="password" inputmode="numeric" autocomplete="current-password" required placeholder="••••••" />
+        </label>
+        <button class="btn btn-primary btn-block" type="submit">دخول</button>
+        <p class="admin-error" id="login-error" hidden>رمز الدخول غير صحيح.</p>
+      </form>
+      <a class="muted" href="index.html">العودة للموقع</a>
+    </div>
+  </section>
+
+  <div id="admin-app" hidden>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true">
+            <span class="gem gem-ruby"></span>
+            <span class="gem gem-coral"></span>
+          </span>
+          <span class="brand-text">
+            <strong>إدارة القائمة</strong>
+            <small>إضافة وتعديل الأصناف</small>
+          </span>
+        </a>
+        <a class="btn btn-ghost" href="index.html">عرض الموقع</a>
+        <button class="btn btn-ghost" id="logout-btn" type="button">خروج</button>
+      </div>
+    </header>
+
+    <main class="container admin-main">
+      <div class="admin-toolbar">
+        <div>
+          <h2>الأصناف</h2>
+          <p class="muted" id="dish-count"></p>
+        </div>
+        <div class="admin-toolbar-actions">
+          <button class="btn btn-ghost" id="reset-menu" type="button">استعادة القائمة الأصلية</button>
+          <button class="btn btn-primary" id="add-dish" type="button">إضافة صنف</button>
+        </div>
+      </div>
+      <div class="admin-list" id="admin-list"></div>
+    </main>
+  </div>
+
+  <div class="modal" id="dish-modal" aria-hidden="true">
+    <div class="modal-card checkout-card">
+      <button class="icon-btn modal-close" id="close-dish" type="button" aria-label="إغلاق">×</button>
+      <div class="modal-body">
+        <p class="eyebrow" id="dish-form-eyebrow">صنف جديد</p>
+        <h2 id="dish-form-title">إضافة صنف</h2>
+        <form id="dish-form">
+          <input type="hidden" name="id" />
+          <label>اسم الصنف
+            <input name="name" type="text" required placeholder="مثال: كبة حلبية" />
+          </label>
+          <label>الوصف
+            <textarea name="desc" rows="2" placeholder="وصف قصير يظهر تحت الاسم"></textarea>
+          </label>
+          <label>التصنيف
+            <select name="category" required></select>
+          </label>
+          <label>الإضافات
+            <select name="extrasKey">
+              <option value="savory">سفرة وطرشي</option>
+              <option value="sweet">حلويات (سفرة وعلبة)</option>
+              <option value="grill">شوي (سفرة، طرشي، تمن، خضرة)</option>
+              <option value="chicken">صينية دجاج (سفرة وطرشي إضافي)</option>
+              <option value="none">بدون إضافات</option>
+            </select>
+          </label>
+          <label>صورة جاهزة
+            <select name="image"></select>
+          </label>
+          <label>أو رابط / مسار صورة
+            <input name="imageUrl" type="text" placeholder="assets/photo.jpg أو https://..." />
+          </label>
+          <label>رفع صورة من الجهاز
+            <input name="imageFile" type="file" accept="image/*" />
+          </label>
+          <label>وحدة القياس
+            <input name="unit" type="text" placeholder="50 قطعة، كيلو، صينية..." />
+          </label>
+          <label class="toggle-extra">
+            <input type="checkbox" name="kilo" />
+            <span>يُباع بالكيلو (الكمية تزداد نصف كيلو)</span>
+          </label>
+          <label>السعر بالدينار (اتركه فارغاً إذا حسب الكمية)
+            <input name="price" type="number" min="0" step="500" placeholder="مثال: 15000" />
+          </label>
+          <fieldset class="admin-variants">
+            <legend>أحجام / أنواع (اختياري)</legend>
+            <p class="muted">إذا أضفت أحجاماً، يُستخدم سعر كل حجم بدل السعر أعلاه.</p>
+            <div id="variant-rows"></div>
+            <button class="btn btn-ghost" id="add-variant" type="button">إضافة حجم</button>
+          </fieldset>
+          <button class="btn btn-primary btn-block" type="submit">حفظ الصنف</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/config.js?v=12"></script>
+  <script src="js/menu-data.js?v=12"></script>
+  <script src="js/menu-store.js?v=12"></script>
+  <script src="js/admin.js?v=12"></script>
+</body>
+</html>

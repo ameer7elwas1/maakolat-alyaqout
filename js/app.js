@@ -4,224 +4,8 @@
     return `${Number(n).toLocaleString("ar-IQ")} د.ع`;
   };
 
-  const extrasSavory = {
-    sofra: { type: "toggle", label: "سفرة", hint: "تجهيز للسفرة والتقديم" },
-    pickles: { type: "toggle", label: "طرشي" }
-  };
-
-  const extrasSweet = {
-    sofra: { type: "toggle", label: "تجهيز للسفرة / تقديم ضيافة" },
-    box: { type: "toggle", label: "علبة مناسبة" }
-  };
-
-  const extrasGrill = {
-    sofra: extrasSavory.sofra,
-    pickles: extrasSavory.pickles,
-    rice: { type: "toggle", label: "تمن أحمر", checked: true },
-    greens: { type: "toggle", label: "خضرة" }
-  };
-
-  const categories = [
-    { id: "all", label: "الكل" },
-    { id: "pastry", label: "معجنات ومقبلات" },
-    { id: "kibbeh", label: "الكبة" },
-    { id: "mains", label: "أطباق رئيسية" },
-    { id: "dolma", label: "الدولمة" },
-    { id: "sweets", label: "الحلويات" },
-    { id: "special", label: "حسب الكمية" }
-  ];
-
-  const menu = [
-    {
-      id: "pastry-mix",
-      category: "pastry",
-      name: "لحم بعجين وميني بيتزا وفطائر",
-      desc: "تشكيلة 50 قطعة، مناسبة للضيافة.",
-      price: 35000,
-      unit: "50 قطعة",
-      image: "assets/pastry-mix.jpg",
-      extras: extrasSavory
-    },
-    {
-      id: "rice-kibbeh-mix",
-      category: "pastry",
-      name: "كبة تمن وبورك وسمبوسة",
-      desc: "50 قطعة مشكلة من كبة التمن والبورك والسمبوسة.",
-      price: 35000,
-      unit: "50 قطعة",
-      image: "assets/kibbeh-mix.jpg",
-      extras: extrasSavory
-    },
-    {
-      id: "kibbeh-halabi",
-      category: "kibbeh",
-      name: "كبة حلبية",
-      desc: "كبة حلبية مقرمشة.",
-      price: 10000,
-      unit: "15 قطعة",
-      image: "assets/kibbeh-halabi.jpg",
-      extras: extrasSavory
-    },
-    {
-      id: "kibbeh-mosul",
-      category: "kibbeh",
-      name: "كبة هلالية موصلية",
-      desc: "كبة موصلية هلالية.",
-      price: 15000,
-      unit: "10 قطع",
-      image: "assets/kibbeh-mosul.jpg",
-      extras: extrasSavory
-    },
-    {
-      id: "kibbeh-burghul",
-      category: "kibbeh",
-      name: "كبة برغل",
-      desc: "اختَر الحجم المناسب لك.",
-      image: "assets/kibbeh-burghul.jpg",
-      extras: extrasSavory,
-      variants: [
-        { id: "double", label: "دبل — 7 قطع", price: 10000 },
-        { id: "medium", label: "الوسط — 10 قطع", price: 10000 }
-      ]
-    },
-    {
-      id: "kabsa",
-      category: "mains",
-      name: "كبسة الدجاج والمقلوبة",
-      desc: "طبق رئيسي جاهز للسفرة.",
-      price: 20000,
-      unit: "صينية",
-      image: "assets/kabsa.jpg",
-      extras: extrasGrill
-    },
-    {
-      id: "chicken-tray",
-      category: "mains",
-      name: "صينية الدجاج",
-      desc: "مع الملحقات: طرشي وخضرة وتتبيلة الدجاج.",
-      image: "assets/chicken-tray.jpg",
-      extras: {
-        sofra: extrasSavory.sofra,
-        extraPickles: { type: "toggle", label: "طرشي إضافي" }
-      },
-      variants: [
-        { id: "full", label: "صينية كاملة مع الملحقات", price: 15000 },
-        { id: "half", label: "نص صينية", price: 8000 }
-      ]
-    },
-    {
-      id: "dolma",
-      category: "dolma",
-      name: "جدر دولمة",
-      desc: "دولمة بيتية على ثلاث أحجام.",
-      image: "assets/dolma.jpg",
-      extras: extrasSavory,
-      variants: [
-        { id: "large", label: "الحجم الكبير", price: 25000 },
-        { id: "medium", label: "الوسط", price: 17000 },
-        { id: "small", label: "الصغير", price: 10000 }
-      ]
-    },
-    {
-      id: "kleija-free-fat",
-      category: "sweets",
-      name: "كليجة بالدهن الحر",
-      desc: "بالتمر والحلقوم، السعر للكيلو.",
-      price: 12000,
-      unit: "كيلو",
-      step: 0.5,
-      image: "assets/kleija-ghee.jpg",
-      extras: extrasSweet
-    },
-    {
-      id: "kleija-walnut",
-      category: "sweets",
-      name: "كليجة الجوز",
-      desc: "كليجة فاخرة بالجوز، السعر للكيلو.",
-      price: 15000,
-      unit: "كيلو",
-      step: 0.5,
-      image: "assets/kleija-walnut.jpg",
-      extras: extrasSweet
-    },
-    {
-      id: "kleija-janna",
-      category: "sweets",
-      name: "كليجة بدهن جنة",
-      desc: "السعر للكيلو.",
-      price: 7000,
-      unit: "كيلو",
-      step: 0.5,
-      image: "assets/kleija-plain.jpg",
-      extras: extrasSweet
-    },
-    {
-      id: "basbousa",
-      category: "sweets",
-      name: "بسبوسة",
-      desc: "اختَر بالقطر أو بالعسل، السعر للكيلو.",
-      unit: "كيلو",
-      step: 0.5,
-      image: "assets/basbousa.jpg",
-      extras: extrasSweet,
-      variants: [
-        { id: "qater", label: "بالقطر — الكيلو", price: 10000 },
-        { id: "honey", label: "بالعسل — الكيلو", price: 15000 }
-      ]
-    },
-    {
-      id: "plain-cake",
-      category: "sweets",
-      name: "كيك سادة",
-      desc: "قالب كبير.",
-      price: 7000,
-      unit: "قالب كبير",
-      image: "assets/cake-plain.jpg",
-      extras: extrasSweet
-    },
-    {
-      id: "layer-cake",
-      category: "sweets",
-      name: "كيك الطبقات",
-      desc: "حسب عدد الطبقات من 3 إلى 10 آلاف.",
-      image: "assets/cake-layer.jpg",
-      extras: extrasSweet,
-      variants: [
-        { id: "c3", label: "طبقات خفيفة — 3,000 د.ع", price: 3000 },
-        { id: "c5", label: "وسط — 5,000 د.ع", price: 5000 },
-        { id: "c8", label: "كبير — 8,000 د.ع", price: 8000 },
-        { id: "c10", label: "فاخر — 10,000 د.ع", price: 10000 }
-      ]
-    },
-    {
-      id: "qatayef",
-      category: "sweets",
-      name: "قطايف بالقشطة",
-      desc: "10 قطع.",
-      price: 8000,
-      unit: "10 قطع",
-      image: "assets/qatayef.jpg",
-      extras: extrasSweet
-    },
-    {
-      id: "grilled-fish",
-      category: "special",
-      name: "سمك شوي",
-      desc: "مع التمن الأحمر والطرشي. السعر حسب الكمية.",
-      price: null,
-      image: "assets/grilled-fish.jpg",
-      extras: extrasGrill
-    },
-    {
-      id: "qouzi",
-      category: "special",
-      name: "قوزي لحم",
-      desc: "حسب الكمية المطلوبة للمناسبة.",
-      price: null,
-      image: "assets/qouzi.jpg",
-      extras: extrasSavory
-    }
-  ];
+  let categories = [];
+  let menu = [];
 
   const els = {
     grid: document.getElementById("menu-grid"),
@@ -258,6 +42,18 @@
   const saveCart = () => localStorage.setItem("yam-cart", JSON.stringify(cart));
   const cartQty = () => cart.reduce((s, i) => s + i.qty, 0);
   const cartSum = () => cart.reduce((s, i) => s + (i.price || 0) * i.qty, 0);
+
+  function hydrateItem(item) {
+    const presets = (window.YAM_DEFAULT && window.YAM_DEFAULT.extras) || {};
+    const extras = presets[item.extrasKey] || item.extras || {};
+    return Object.assign({}, item, { extras });
+  }
+
+  function loadCatalog() {
+    const data = (window.MenuStore && window.MenuStore.load()) || { categories: [], menu: [] };
+    categories = (data.categories || []).slice();
+    menu = (data.menu || []).map(hydrateItem);
+  }
 
   function toast(msg) {
     els.toast.textContent = msg;
@@ -639,6 +435,7 @@
     });
   }
 
+  loadCatalog();
   renderCategories();
   renderMenu();
   renderCart();
