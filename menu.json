@@ -274,7 +274,7 @@
       "desc": "",
       "category": "special",
       "extrasKey": "grill",
-      "image": "assets/uploads/dish-1789491571122.jpg?v=1789491572989",
+      "image": "assets/uploads/dish-1789491571122.jpg?v=1789491764952",
       "unit": "",
       "price": 500
     }
@@ -298,5 +298,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789491571123
+  "updatedAt": 1789491762952
 }
