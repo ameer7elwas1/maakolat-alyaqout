@@ -1,9 +1,9 @@
 window.YAM_STORE_KEY = "yam-menu-v1";
-window.YAM_PUB_KEY = "yam-pub-v1";
+window.YAM_PUB_KEY = "yam-pub-v2";
 
 window.MenuStore = {
   MAX_WRAPPED: 920,
-  FETCH_MS: 4000,
+  FETCH_MS: 15000,
   defaultData() {
     const src = window.YAM_DEFAULT || { categories: [], menu: [], extras: {}, assets: [] };
     return {
@@ -40,7 +40,8 @@ window.MenuStore = {
       }),
       assets: Array.isArray(inner.assets) && inner.assets.length
         ? inner.assets
-        : (fallback.assets || [])
+        : (fallback.assets || []),
+      updatedAt: inner.updatedAt || 0
     };
   },
   payload(data) {
@@ -124,69 +125,104 @@ window.MenuStore = {
       if (timer) clearTimeout(timer);
     }
   },
-  async loadRemote() {
+  async loadChunks() {
     const ids = this.chunkIds();
-    if (ids.length) {
-      try {
-        const parts = await Promise.all(ids.map((id) => this.fetchJson(this.chunkUrl(id))));
-        const text = parts.map((p) => {
-          const c = p && p.data && typeof p.data.c === "string" ? p.data.c : "";
-          return c === "." ? "" : c;
-        }).join("");
-        if (text) {
-          const data = this.normalize(JSON.parse(text));
-          if (data) return data;
-        }
-      } catch (err) {
-        console.warn("MenuStore.loadRemote chunks", err);
-      }
+    if (!ids.length) return null;
+    const parts = [];
+    for (let i = 0; i < ids.length; i += 4) {
+      const batch = ids.slice(i, i + 4);
+      const rows = await Promise.all(batch.map((id) => this.fetchJson(this.chunkUrl(id))));
+      parts.push.apply(parts, rows);
     }
-    try {
-      const json = await this.fetchJson("menu.json", 2500);
-      const data = this.normalize(json);
-      if (data) return data;
-    } catch (err) {
-      console.warn("MenuStore.loadRemote menu.json", err);
-    }
-    return null;
+    const text = parts.map((p) => {
+      const c = p && p.data && typeof p.data.c === "string" ? p.data.c : "";
+      return c === "." ? "" : c;
+    }).join("");
+    if (!text) return null;
+    return this.normalize(JSON.parse(text));
   },
-  merge(remote, local) {
+  async loadFileCatalog() {
+    try {
+      return this.normalize(await this.fetchJson("menu.json", 4000));
+    } catch (err) {
+      console.warn("MenuStore.loadFileCatalog", err);
+      return null;
+    }
+  },
+  pickLatest() {
+    const list = Array.prototype.slice.call(arguments).filter(Boolean);
+    if (!list.length) return null;
+    return list.sort((a, b) => (Number(b.updatedAt) || 0) - (Number(a.updatedAt) || 0))[0];
+  },
+  async loadRemote() {
+    let cloud = null;
+    try {
+      cloud = await this.loadChunks();
+    } catch (err) {
+      console.warn("MenuStore.loadChunks", err);
+    }
+    const file = await this.loadFileCatalog();
+    return this.pickLatest(cloud, file) || cloud || file;
+  },
+  fingerprint(data) {
+    return JSON.stringify((data && data.menu || []).map((item) => ({
+      id: item.id,
+      name: item.name,
+      desc: item.desc,
+      image: String(item.image || "").slice(0, 120),
+      price: item.price,
+      unit: item.unit,
+      step: item.step,
+      extrasKey: item.extrasKey,
+      variants: item.variants || null
+    })));
+  },
+  overlay(remote, local) {
     if (!remote) return local;
     if (!local) return remote;
-    const have = {};
-    remote.menu.forEach((item) => { have[item.id] = true; });
-    const extra = local.menu.filter((item) => item && item.id && !have[item.id]);
-    if (!extra.length) {
-      return {
-        categories: remote.categories,
-        menu: remote.menu,
-        assets: remote.assets && remote.assets.length ? remote.assets : local.assets
-      };
-    }
+    const byId = {};
+    remote.menu.forEach((item) => { byId[item.id] = item; });
+    local.menu.forEach((item) => { byId[item.id] = item; });
+    const seen = {};
+    const menu = [];
+    remote.menu.forEach((item) => {
+      menu.push(byId[item.id]);
+      seen[item.id] = true;
+    });
+    local.menu.forEach((item) => {
+      if (item && item.id && !seen[item.id]) menu.push(item);
+    });
     const assets = (remote.assets || []).slice();
-    extra.forEach((item) => {
-      if (item.image && assets.indexOf(item.image) < 0 && String(item.image).indexOf("data:") !== 0) {
-        assets.push(item.image);
-      }
+    (local.assets || []).concat(local.menu.map((i) => i.image)).forEach((src) => {
+      if (src && assets.indexOf(src) < 0 && String(src).indexOf("data:") !== 0) assets.push(src);
     });
     return {
-      categories: remote.categories && remote.categories.length ? remote.categories : local.categories,
-      menu: remote.menu.concat(extra),
-      assets: assets.length ? assets : (local.assets || [])
+      categories: (local.categories && local.categories.length) ? local.categories : remote.categories,
+      menu,
+      assets
     };
   },
-  withoutHeavyImages(data) {
+  replaceHeavyImages(data, fallbackById) {
     return {
       categories: data.categories,
       menu: (data.menu || []).map((item) => {
         const next = Object.assign({}, item);
         if (next.image && String(next.image).slice(0, 5) === "data:") {
-          next.image = "assets/pastry-mix.jpg";
+          const prev = fallbackById && fallbackById[item.id];
+          next.image = (prev && String(prev).indexOf("data:") !== 0) ? prev : "assets/pastry-mix.jpg";
         }
         return next;
       }),
       assets: data.assets || []
     };
+  },
+  fitsRemote(data) {
+    try {
+      const parts = this.splitChunks(JSON.stringify(this.payload(data)));
+      return parts.length <= this.chunkIds().length;
+    } catch (err) {
+      return false;
+    }
   },
   async putChunk(id, text) {
     let lastErr = null;
@@ -206,9 +242,12 @@ window.MenuStore = {
     }
     throw lastErr || new Error("putChunk failed");
   },
-  async saveRemote(data) {
+  async saveRemote(data, previous) {
     const ids = this.chunkIds();
     if (!ids.length) return false;
+    const prevCat = previous || this.loadPublished() || this.defaultData();
+    const prev = {};
+    prevCat.menu.forEach((item) => { prev[item.id] = item.image; });
     const send = async (body) => {
       const text = JSON.stringify(this.payload(body));
       const parts = this.splitChunks(text);
@@ -216,14 +255,26 @@ window.MenuStore = {
       for (let i = 0; i < ids.length; i++) {
         await this.putChunk(ids[i], parts[i] || "");
       }
+      let check = null;
+      for (let v = 0; v < 3; v++) {
+        if (v) await this.sleep(400);
+        check = await this.loadChunks();
+        if (check && this.fingerprint(check) === this.fingerprint(body)) return;
+      }
+      throw new Error("catalog verify failed");
     };
+    const stripped = this.replaceHeavyImages(data, prev);
     try {
+      if (!this.fitsRemote(data)) {
+        await send(stripped);
+        return "images-stripped";
+      }
       await send(data);
       return true;
     } catch (err) {
       console.warn("MenuStore.saveRemote", err);
       try {
-        await send(this.withoutHeavyImages(data));
+        await send(stripped);
         return "images-stripped";
       } catch (err2) {
         console.warn("MenuStore.saveRemote retry", err2);
@@ -243,23 +294,26 @@ window.MenuStore = {
   async loadAsync() {
     const remote = await this.loadRemote();
     const local = this.loadLocal();
-    const merged = this.merge(remote, local) || local || this.defaultData();
-    if (local) {
-      const remoteIds = remote ? remote.menu.map((i) => i.id).join() : "";
-      const mergedIds = merged.menu.map((i) => i.id).join();
-      if (!remote || mergedIds !== remoteIds) {
-        await this.saveRemote(merged);
-      }
+    const merged = this.overlay(remote, local) || local || this.defaultData();
+    if (local && this.fingerprint(merged) !== this.fingerprint(remote || { menu: [] })) {
+      await this.saveRemote(merged, remote || local);
     }
     this.saveLocal(merged);
-    if (remote) this.savePublished(remote);
+    this.savePublished(merged);
     return merged;
   },
   async save(data) {
+    const previous = this.loadLocal() || this.loadPublished() || this.defaultData();
     const clean = this.payload(data);
     this.saveLocal(clean);
-    const remote = await this.saveRemote(clean);
-    if (remote) this.savePublished(clean);
+    const remote = await this.saveRemote(clean, previous);
+    if (remote === "images-stripped") {
+      const prev = {};
+      previous.menu.forEach((item) => { prev[item.id] = item.image; });
+      this.savePublished(this.replaceHeavyImages(clean, prev));
+    } else if (remote) {
+      this.savePublished(clean);
+    }
     return { local: true, remote };
   },
   async reset() {

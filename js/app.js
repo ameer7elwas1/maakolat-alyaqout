@@ -445,12 +445,16 @@
     renderCart();
     bind();
     if (window.MenuStore && window.MenuStore.refreshPublished) {
-      window.MenuStore.refreshPublished().then((data) => {
+      const applyLive = (data) => {
         if (!data || !data.menu || !data.menu.length) return;
         applyCatalog(data);
         renderCategories();
         renderMenu();
-      }).catch((err) => console.warn("refreshPublished", err));
+      };
+      window.MenuStore.refreshPublished().then(applyLive).catch((err) => console.warn("refreshPublished", err));
+      setTimeout(() => {
+        window.MenuStore.refreshPublished().then(applyLive).catch(() => {});
+      }, 8000);
     }
   }
   start();

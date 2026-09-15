@@ -1,0 +1,56 @@
+name: Sync published menu
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch live catalog and write menu.json
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+          const cfg = fs.readFileSync("js/config.js", "utf8");
+          const block = cfg.match(/catalogChunks:\s*\[([\s\S]*?)\]/);
+          if (!block) throw new Error("catalogChunks missing");
+          const ids = [...block[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+          const baseMatch = cfg.match(/catalogBase:\s*"([^"]+)"/);
+          const base = (baseMatch && baseMatch[1]) || "https://api.restful-api.dev/objects/";
+          (async () => {
+            const parts = [];
+            for (const id of ids) {
+              const res = await fetch(base + id, { cache: "no-store" });
+              if (!res.ok) throw new Error("HTTP " + res.status + " " + id);
+              parts.push(await res.json());
+            }
+            const text = parts.map((p) => (p.data && typeof p.data.c === "string" ? p.data.c : "")).join("");
+            const data = JSON.parse(text);
+            if (!data.menu || !data.menu.length) throw new Error("empty catalog");
+            const out = {
+              categories: data.categories || [],
+              menu: data.menu,
+              assets: data.assets || [],
+              updatedAt: data.updatedAt || Date.now()
+            };
+            fs.writeFileSync("menu.json", JSON.stringify(out, null, 2) + "\n");
+            console.log("wrote", out.menu.length, "dishes");
+          })().catch((err) => {
+            console.error(err);
+            process.exit(1);
+          });
+          NODE
+      - name: Commit menu.json if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add menu.json
+          git diff --staged --quiet && echo "No menu changes" && exit 0
+          git commit -m "Publish latest admin menu for customers."
+          git push

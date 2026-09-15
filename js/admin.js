@@ -208,12 +208,33 @@
     }
   });
 
+  function compressImage(dataUrl) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 480;
+        const scale = Math.min(1, max / img.width, max / img.height);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.55));
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    });
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const variants = collectVariants();
     const priceRaw = form.price.value.trim();
     const uploaded = form.dataset.uploadedImage || "";
-    const image = uploaded || form.imageUrl.value.trim() || form.image.value;
+    const previous = (catalog.menu.find((i) => i.id === form.id.value) || {}).image || "";
+    let image = uploaded || form.imageUrl.value.trim() || form.image.value;
+    if (image && String(image).slice(0, 5) === "data:") {
+      image = await compressImage(image);
+    }
     if (!image) {
       toast("اختَر صورة أو أدخل رابطاً");
       return;
@@ -241,9 +262,14 @@
     const result = await persist();
     closeModal();
     if (result.remote === "images-stripped") {
-      toast("تم النشر للزبائن. صورة الرفع كبيرة فظهرت صورة افتراضية — اختَر صورة من القائمة");
+      const published = catalog.menu.find((i) => i.id === item.id);
+      if (published && previous && String(previous).indexOf("data:") !== 0) {
+        published.image = previous;
+        renderList();
+      }
+      toast("تم حفظ التعديل للزبائن. الصورة المرفوعة كبيرة — اختَر صورة جاهزة من القائمة");
     } else if (result.remote) {
-      toast("تم حفظ الصنف ويظهر الآن لكل الزبائن");
+      toast("تم حفظ التعديل ويظهر الآن لكل الزبائن");
     } else {
       toast("حُفظ على هذا الجهاز فقط. تحقق من الإنترنت واحفظ مرة ثانية");
     }
