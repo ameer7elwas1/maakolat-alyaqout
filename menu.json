@@ -32,13 +32,13 @@
   "menu": [
     {
       "id": "pastry-mix",
+      "category": "pastry",
       "name": "لحم بعجين وميني بيتزا وفطائر",
       "desc": "تشكيلة 50 قطعة، مناسبة للضيافة.",
-      "category": "pastry",
-      "extrasKey": "savory",
-      "image": "assets/uploads/pastry-mix.jpg?v=1789491213407",
+      "price": 35000,
       "unit": "50 قطعة",
-      "price": 35000
+      "image": "assets/pastry-mix.jpg",
+      "extrasKey": "savory"
     },
     {
       "id": "rice-kibbeh-mix",
@@ -102,20 +102,19 @@
     },
     {
       "id": "chicken-tray",
+      "category": "mains",
       "name": "صينية الدجاج",
       "desc": "مع الملحقات: طرشي وخضرة وتتبيلة الدجاج.",
-      "category": "mains",
+      "image": "assets/chicken-tray.jpg",
       "extrasKey": "chicken",
-      "image": "assets/pastry-mix.jpg",
-      "unit": "",
       "variants": [
         {
-          "id": "v1",
+          "id": "full",
           "label": "صينية كاملة مع الملحقات",
           "price": 15000
         },
         {
-          "id": "v2",
+          "id": "half",
           "label": "نص صينية",
           "price": 8000
         }
@@ -331,5 +330,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789491211842
+  "updatedAt": 1789491217537
 }
