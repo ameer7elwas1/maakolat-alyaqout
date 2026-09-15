@@ -256,7 +256,7 @@
       "desc": "مع التمن الأحمر والطرشي. السعر حسب الكمية.",
       "category": "special",
       "extrasKey": "grill",
-      "image": "assets/uploads/grilled-fish.jpg?v=1789492199696",
+      "image": "assets/grilled-fish.jpg",
       "unit": "",
       "price": null
     },
@@ -275,7 +275,7 @@
       "desc": "",
       "category": "special",
       "extrasKey": "grill",
-      "image": "assets/uploads/dish-1789491571122.jpg?v=1789492202042",
+      "image": "assets/pastry-mix.jpg",
       "unit": "",
       "price": 500
     }
@@ -299,5 +299,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789492197802
+  "updatedAt": 1789492201223
 }
