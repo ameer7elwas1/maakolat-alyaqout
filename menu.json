@@ -102,19 +102,20 @@
     },
     {
       "id": "chicken-tray",
-      "category": "mains",
       "name": "صينية الدجاج",
       "desc": "مع الملحقات: طرشي وخضرة وتتبيلة الدجاج.",
-      "image": "assets/chicken-tray.jpg",
+      "category": "mains",
       "extrasKey": "chicken",
+      "image": "assets/chicken-tray.jpg",
+      "unit": "",
       "variants": [
         {
-          "id": "full",
+          "id": "v1",
           "label": "صينية كاملة مع الملحقات",
           "price": 15000
         },
         {
-          "id": "half",
+          "id": "v2",
           "label": "نص صينية",
           "price": 8000
         }
@@ -305,7 +306,7 @@
       "desc": "مابية حيل نعسانه",
       "category": "mains",
       "extrasKey": "grill",
-      "image": "assets/uploads/dish-1789486426354.jpg?v=1789499613544",
+      "image": "assets/uploads/dish-1789486426354.jpg?v=1789499645672",
       "unit": "",
       "price": null
     }
@@ -329,5 +330,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789499611063
+  "updatedAt": 1789499641176
 }
