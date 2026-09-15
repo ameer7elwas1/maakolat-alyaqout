@@ -32,13 +32,13 @@
   "menu": [
     {
       "id": "pastry-mix",
-      "category": "pastry",
       "name": "لحم بعجين وميني بيتزا وفطائر",
       "desc": "تشكيلة 50 قطعة، مناسبة للضيافة.",
-      "price": 35000,
+      "category": "pastry",
+      "extrasKey": "savory",
+      "image": "assets/uploads/pastry-mix.jpg?v=1789491107347",
       "unit": "50 قطعة",
-      "image": "assets/pastry-mix.jpg",
-      "extrasKey": "savory"
+      "price": 35000
     },
     {
       "id": "rice-kibbeh-mix",
@@ -102,19 +102,20 @@
     },
     {
       "id": "chicken-tray",
-      "category": "mains",
       "name": "صينية الدجاج",
       "desc": "مع الملحقات: طرشي وخضرة وتتبيلة الدجاج.",
-      "image": "assets/chicken-tray.jpg",
+      "category": "mains",
       "extrasKey": "chicken",
+      "image": "assets/pastry-mix.jpg",
+      "unit": "",
       "variants": [
         {
-          "id": "full",
+          "id": "v1",
           "label": "صينية كاملة مع الملحقات",
           "price": 15000
         },
         {
-          "id": "half",
+          "id": "v2",
           "label": "نص صينية",
           "price": 8000
         }
@@ -267,6 +268,48 @@
       "price": null,
       "image": "assets/qouzi.jpg",
       "extrasKey": "savory"
+    },
+    {
+      "id": "dish-1789484692249",
+      "name": "admin",
+      "desc": "admin",
+      "category": "sweets",
+      "extrasKey": "chicken",
+      "image": "assets/pastry-mix.jpg",
+      "unit": "",
+      "variants": [
+        {
+          "id": "v1",
+          "label": "1",
+          "price": 22000
+        },
+        {
+          "id": "v2",
+          "label": "2",
+          "price": 33000
+        }
+      ]
+    },
+    {
+      "id": "dish-1789486426354",
+      "name": "مطبك نوم وعجز",
+      "desc": "مابية حيل نعسانه",
+      "category": "mains",
+      "extrasKey": "grill",
+      "image": "assets/pastry-mix.jpg",
+      "unit": "",
+      "variants": [
+        {
+          "id": "v1",
+          "label": "8 ساعات",
+          "price": 1000
+        },
+        {
+          "id": "v2",
+          "label": "يومين",
+          "price": 3000
+        }
+      ]
     }
   ],
   "assets": [
@@ -288,5 +331,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789491084275
+  "updatedAt": 1789491105623
 }
