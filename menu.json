@@ -306,7 +306,7 @@
       "desc": "مابية حيل نعسانه",
       "category": "mains",
       "extrasKey": "grill",
-      "image": "assets/uploads/dish-1789486426354.jpg?v=1789499645672",
+      "image": "assets/uploads/dish-1789486426354.jpg?v=1789499651450",
       "unit": "",
       "price": null
     }
@@ -330,5 +330,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789499641176
+  "updatedAt": 1789499641924
 }
