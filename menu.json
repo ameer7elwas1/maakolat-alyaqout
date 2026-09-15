@@ -36,7 +36,7 @@
       "desc": "تشكيلة 50 قطعة، مناسبة للضيافة.",
       "category": "pastry",
       "extrasKey": "savory",
-      "image": "assets/uploads/pastry-mix.jpg?v=1789491205713",
+      "image": "assets/uploads/pastry-mix.jpg?v=1789491213407",
       "unit": "50 قطعة",
       "price": 35000
     },
@@ -331,5 +331,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789491204363
+  "updatedAt": 1789491211842
 }
