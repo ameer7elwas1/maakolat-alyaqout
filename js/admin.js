@@ -14,6 +14,7 @@
 
   let catalog = window.MenuStore.load();
   let editingId = null;
+  const publishStatus = document.getElementById("publish-status");
 
   const money = (n) => {
     if (n == null) return "حسب الكمية";
@@ -143,9 +144,18 @@
     }).filter(Boolean);
   }
 
-  function persist() {
-    window.MenuStore.save(catalog);
+  function setPublishStatus(ok) {
+    if (!publishStatus) return;
+    publishStatus.textContent = ok
+      ? "القائمة منشورة وتظهر لكل الزبائن على الموقع."
+      : "الحفظ على هذا الجهاز فقط. تعذر النشر للزبائن — تحقق من الإنترنت ثم احفظ مرة ثانية.";
+  }
+
+  async function persist() {
+    const result = await window.MenuStore.save(catalog);
     renderList();
+    setPublishStatus(!!result.remote);
+    return result;
   }
 
   loginForm.addEventListener("submit", (e) => {
@@ -174,16 +184,16 @@
     variantRows.appendChild(variantRow());
   });
 
-  document.getElementById("reset-menu").addEventListener("click", () => {
+  document.getElementById("reset-menu").addEventListener("click", async () => {
     if (!confirm("استعادة القائمة الأصلية؟ ستُحذف الأصناف التي أضفتها من لوحة التحكم.")) return;
-    window.MenuStore.reset();
-    catalog = window.MenuStore.load();
+    catalog = await window.MenuStore.reset();
     fillSelects();
     renderList();
+    setPublishStatus(true);
     toast("تمت استعادة القائمة الأصلية");
   });
 
-  listEl.addEventListener("click", (e) => {
+  listEl.addEventListener("click", async (e) => {
     const editId = e.target.dataset.edit;
     const delId = e.target.dataset.del;
     if (editId) {
@@ -193,12 +203,12 @@
       const item = catalog.menu.find((i) => i.id === delId);
       if (!item || !confirm(`حذف «${item.name}»؟`)) return;
       catalog.menu = catalog.menu.filter((i) => i.id !== delId);
-      persist();
-      toast("تم حذف الصنف");
+      const result = await persist();
+      toast(result.remote ? "تم حذف الصنف من الموقع" : "تم الحذف على هذا الجهاز فقط");
     }
   });
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const variants = collectVariants();
     const priceRaw = form.price.value.trim();
@@ -228,9 +238,15 @@
     if (idx >= 0) catalog.menu[idx] = item;
     else catalog.menu.push(item);
     delete form.dataset.uploadedImage;
-    persist();
+    const result = await persist();
     closeModal();
-    toast("تم حفظ الصنف ويظهر الآن في الموقع");
+    if (result.remote === "images-stripped") {
+      toast("تم النشر للزبائن. صورة الرفع كبيرة فظهرت صورة افتراضية — اختَر صورة من القائمة");
+    } else if (result.remote) {
+      toast("تم حفظ الصنف ويظهر الآن لكل الزبائن");
+    } else {
+      toast("حُفظ على هذا الجهاز فقط. تحقق من الإنترنت واحفظ مرة ثانية");
+    }
   });
 
   form.imageFile.addEventListener("change", () => {
@@ -249,6 +265,11 @@
     reader.readAsDataURL(file);
   });
 
-  if (isAuthed()) showApp();
-  else showLogin();
+  async function init() {
+    catalog = await window.MenuStore.loadAsync();
+    setPublishStatus(true);
+    if (isAuthed()) showApp();
+    else showLogin();
+  }
+  init();
 })();

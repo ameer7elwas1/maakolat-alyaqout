@@ -49,8 +49,8 @@
     return Object.assign({}, item, { extras });
   }
 
-  function loadCatalog() {
-    const data = (window.MenuStore && window.MenuStore.load()) || { categories: [], menu: [] };
+  async function loadCatalog() {
+    const data = (window.MenuStore && await window.MenuStore.loadAsync()) || { categories: [], menu: [] };
     categories = (data.categories || []).slice();
     menu = (data.menu || []).map(hydrateItem);
   }
@@ -435,9 +435,12 @@
     });
   }
 
-  loadCatalog();
-  renderCategories();
-  renderMenu();
-  renderCart();
-  bind();
+  async function start() {
+    await loadCatalog();
+    renderCategories();
+    renderMenu();
+    renderCart();
+    bind();
+  }
+  start();
 })();

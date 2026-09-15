@@ -699,6 +699,7 @@ input[type="text"], input[type="tel"], textarea, select {
   margin-bottom: 22px;
 }
 .admin-toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+#publish-status { margin: 6px 0 0; font-size: 0.92rem; }
 .admin-list { display: grid; gap: 12px; }
 .admin-dish {
   display: grid;
