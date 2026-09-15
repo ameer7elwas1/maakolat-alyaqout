@@ -266,10 +266,20 @@
   });
 
   async function init() {
-    catalog = await window.MenuStore.loadAsync();
-    setPublishStatus(true);
+    catalog = window.MenuStore.load();
     if (isAuthed()) showApp();
     else showLogin();
+    try {
+      catalog = await window.MenuStore.loadAsync();
+      setPublishStatus(true);
+      if (isAuthed()) {
+        fillSelects();
+        renderList();
+      }
+    } catch (err) {
+      console.warn("admin init", err);
+      setPublishStatus(false);
+    }
   }
   init();
 })();

@@ -1,7 +1,9 @@
 window.YAM_STORE_KEY = "yam-menu-v1";
+window.YAM_PUB_KEY = "yam-pub-v1";
 
 window.MenuStore = {
   MAX_WRAPPED: 920,
+  FETCH_MS: 4000,
   defaultData() {
     const src = window.YAM_DEFAULT || { categories: [], menu: [], extras: {}, assets: [] };
     return {
@@ -54,18 +56,30 @@ window.MenuStore = {
       updatedAt: Date.now()
     };
   },
-  loadLocal() {
+  readKey(key) {
     try {
-      const raw = localStorage.getItem(window.YAM_STORE_KEY);
+      const raw = localStorage.getItem(key);
       if (!raw) return null;
       return this.normalize(JSON.parse(raw));
     } catch (err) {
-      console.warn("MenuStore.loadLocal", err);
+      console.warn("MenuStore.readKey", key, err);
       return null;
     }
   },
+  loadLocal() {
+    return this.readKey(window.YAM_STORE_KEY);
+  },
+  loadPublished() {
+    return this.readKey(window.YAM_PUB_KEY);
+  },
   saveLocal(data) {
     localStorage.setItem(window.YAM_STORE_KEY, JSON.stringify(this.payload(data)));
+  },
+  savePublished(data) {
+    localStorage.setItem(window.YAM_PUB_KEY, JSON.stringify(this.payload(data)));
+  },
+  loadImmediate() {
+    return this.loadPublished() || this.defaultData();
   },
   wrappedBytes(piece) {
     return new TextEncoder().encode(JSON.stringify({ name: "yam-menu", data: { c: piece || "" } })).length;
@@ -95,10 +109,20 @@ window.MenuStore = {
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   },
-  async fetchJson(url) {
-    const res = await fetch(this.cacheUrl(url), { cache: "no-store" });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    return res.json();
+  async fetchJson(url, timeout) {
+    const ms = timeout == null ? this.FETCH_MS : timeout;
+    const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timer = ctrl ? setTimeout(() => ctrl.abort(), ms) : null;
+    try {
+      const res = await fetch(this.cacheUrl(url), {
+        cache: "no-store",
+        signal: ctrl ? ctrl.signal : undefined
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
   },
   async loadRemote() {
     const ids = this.chunkIds();
@@ -118,7 +142,7 @@ window.MenuStore = {
       }
     }
     try {
-      const json = await this.fetchJson("menu.json");
+      const json = await this.fetchJson("menu.json", 2500);
       const data = this.normalize(json);
       if (data) return data;
     } catch (err) {
@@ -208,7 +232,13 @@ window.MenuStore = {
     }
   },
   load() {
-    return this.loadLocal() || this.defaultData();
+    return this.loadLocal() || this.loadPublished() || this.defaultData();
+  },
+  async refreshPublished() {
+    const remote = await this.loadRemote();
+    if (!remote) return null;
+    this.savePublished(remote);
+    return remote;
   },
   async loadAsync() {
     const remote = await this.loadRemote();
@@ -222,12 +252,14 @@ window.MenuStore = {
       }
     }
     this.saveLocal(merged);
+    if (remote) this.savePublished(remote);
     return merged;
   },
   async save(data) {
     const clean = this.payload(data);
     this.saveLocal(clean);
     const remote = await this.saveRemote(clean);
+    if (remote) this.savePublished(clean);
     return { local: true, remote };
   },
   async reset() {

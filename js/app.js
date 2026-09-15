@@ -49,10 +49,13 @@
     return Object.assign({}, item, { extras });
   }
 
-  async function loadCatalog() {
-    const data = (window.MenuStore && await window.MenuStore.loadAsync()) || { categories: [], menu: [] };
-    categories = (data.categories || []).slice();
-    menu = (data.menu || []).map(hydrateItem);
+  function applyCatalog(data) {
+    categories = (data && data.categories || []).slice();
+    menu = (data && data.menu || []).map(hydrateItem);
+  }
+
+  function loadCatalog() {
+    applyCatalog((window.MenuStore && window.MenuStore.loadImmediate()) || { categories: [], menu: [] });
   }
 
   function toast(msg) {
@@ -435,12 +438,20 @@
     });
   }
 
-  async function start() {
-    await loadCatalog();
+  function start() {
+    loadCatalog();
     renderCategories();
     renderMenu();
     renderCart();
     bind();
+    if (window.MenuStore && window.MenuStore.refreshPublished) {
+      window.MenuStore.refreshPublished().then((data) => {
+        if (!data || !data.menu || !data.menu.length) return;
+        applyCatalog(data);
+        renderCategories();
+        renderMenu();
+      }).catch((err) => console.warn("refreshPublished", err));
+    }
   }
   start();
 })();
