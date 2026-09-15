@@ -288,27 +288,6 @@
           "price": 33000
         }
       ]
-    },
-    {
-      "id": "dish-1789486426354",
-      "name": "مطبك نوم وعجز",
-      "desc": "مابية حيل نعسانه",
-      "category": "mains",
-      "extrasKey": "grill",
-      "image": "assets/uploads/dish-1789486426354.jpg?v=1789491273572",
-      "unit": "",
-      "variants": [
-        {
-          "id": "v1",
-          "label": "8 ساعات",
-          "price": 1000
-        },
-        {
-          "id": "v2",
-          "label": "يومين",
-          "price": 3000
-        }
-      ]
     }
   ],
   "assets": [
@@ -330,5 +309,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789491271578
+  "updatedAt": 1789491411393
 }
