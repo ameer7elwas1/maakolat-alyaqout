@@ -2,8 +2,7 @@ window.YAM_STORE_KEY = "yam-menu-v1";
 window.YAM_PUB_KEY = "yam-pub-v2";
 
 window.MenuStore = {
-  MAX_WRAPPED: 920,
-  FETCH_MS: 15000,
+  FETCH_MS: 12000,
   defaultData() {
     const src = window.YAM_DEFAULT || { categories: [], menu: [], extras: {}, assets: [] };
     return {
@@ -12,13 +11,25 @@ window.MenuStore = {
       assets: (src.assets || []).slice()
     };
   },
-  chunkIds() {
-    const cfg = window.SITE_CONFIG || {};
-    return Array.isArray(cfg.catalogChunks) ? cfg.catalogChunks.slice() : [];
+  repo() {
+    return String((window.SITE_CONFIG || {}).githubRepo || "ameer7elwas1/maakolat-alyaqout").trim();
   },
-  chunkUrl(id) {
-    const base = String((window.SITE_CONFIG || {}).catalogBase || "https://api.restful-api.dev/objects/");
-    return base + id;
+  decodeAuth(hex) {
+    const pin = String((window.SITE_CONFIG || {}).adminPin || "");
+    const h = String(hex || "").replace(/\s/g, "");
+    if (!h || !pin || h.length % 2) return "";
+    let out = "";
+    for (let i = 0; i < h.length; i += 2) {
+      const code = parseInt(h.substr(i, 2), 16) ^ pin.charCodeAt((i / 2) % pin.length);
+      out += String.fromCharCode(code);
+    }
+    return out;
+  },
+  token() {
+    const cfg = window.SITE_CONFIG || {};
+    let stored = "";
+    try { stored = localStorage.getItem("yam-gh-token") || ""; } catch (err) {}
+    return String(cfg.githubToken || stored || this.decodeAuth(cfg.githubAuth) || "").trim();
   },
   cacheUrl(url) {
     if (!url) return url;
@@ -82,88 +93,6 @@ window.MenuStore = {
   loadImmediate() {
     return this.loadPublished() || this.defaultData();
   },
-  wrappedBytes(piece) {
-    return new TextEncoder().encode(JSON.stringify({ name: "yam-menu", data: { c: piece || "" } })).length;
-  },
-  splitChunks(text) {
-    const chunks = [];
-    let i = 0;
-    while (i < text.length) {
-      let lo = 1;
-      let hi = Math.min(text.length - i, 700);
-      let ok = 1;
-      while (lo <= hi) {
-        const mid = (lo + hi) >> 1;
-        const piece = text.slice(i, i + mid);
-        if (this.wrappedBytes(piece) <= this.MAX_WRAPPED) {
-          ok = mid;
-          lo = mid + 1;
-        } else {
-          hi = mid - 1;
-        }
-      }
-      chunks.push(text.slice(i, i + ok));
-      i += ok;
-    }
-    return chunks;
-  },
-  async sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  },
-  async fetchJson(url, timeout) {
-    const ms = timeout == null ? this.FETCH_MS : timeout;
-    const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
-    const timer = ctrl ? setTimeout(() => ctrl.abort(), ms) : null;
-    try {
-      const res = await fetch(this.cacheUrl(url), {
-        cache: "no-store",
-        signal: ctrl ? ctrl.signal : undefined
-      });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return await res.json();
-    } finally {
-      if (timer) clearTimeout(timer);
-    }
-  },
-  async loadChunks() {
-    const ids = this.chunkIds();
-    if (!ids.length) return null;
-    const parts = [];
-    for (let i = 0; i < ids.length; i += 4) {
-      const batch = ids.slice(i, i + 4);
-      const rows = await Promise.all(batch.map((id) => this.fetchJson(this.chunkUrl(id))));
-      parts.push.apply(parts, rows);
-    }
-    const text = parts.map((p) => {
-      const c = p && p.data && typeof p.data.c === "string" ? p.data.c : "";
-      return c === "." ? "" : c;
-    }).join("");
-    if (!text) return null;
-    return this.normalize(JSON.parse(text));
-  },
-  async loadFileCatalog() {
-    try {
-      return this.normalize(await this.fetchJson("menu.json", 4000));
-    } catch (err) {
-      console.warn("MenuStore.loadFileCatalog", err);
-      return null;
-    }
-  },
-  pickLatest() {
-    const list = Array.prototype.slice.call(arguments).filter(Boolean);
-    if (!list.length) return null;
-    return list.sort((a, b) => (Number(b.updatedAt) || 0) - (Number(a.updatedAt) || 0))[0];
-  },
-  async loadRemote() {
-    let cloud = null;
-    try {
-      cloud = await this.loadChunks();
-    } catch (err) {
-      console.warn("MenuStore.loadChunks", err);
-    }
-    const file = await this.loadFileCatalog();
-    return this.pickLatest(cloud, file) || cloud || file;
-  },
   fingerprint(data) {
     return JSON.stringify((data && data.menu || []).map((item) => ({
       id: item.id,
@@ -202,84 +131,115 @@ window.MenuStore = {
       assets
     };
   },
-  replaceHeavyImages(data, fallbackById) {
-    return {
-      categories: data.categories,
-      menu: (data.menu || []).map((item) => {
-        const next = Object.assign({}, item);
-        if (next.image && String(next.image).slice(0, 5) === "data:") {
-          const prev = fallbackById && fallbackById[item.id];
-          next.image = (prev && String(prev).indexOf("data:") !== 0) ? prev : "assets/pastry-mix.jpg";
-        }
-        return next;
-      }),
-      assets: data.assets || []
-    };
+  utf8ToBase64(text) {
+    return btoa(unescape(encodeURIComponent(text)));
   },
-  fitsRemote(data) {
+  async dataUrlToBase64(dataUrl) {
+    const res = await fetch(dataUrl);
+    const buf = await res.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return btoa(binary);
+  },
+  ghHeaders() {
+    const token = this.token();
+    const headers = {
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    };
+    if (token) headers.Authorization = "Bearer " + token;
+    return headers;
+  },
+  async fetchJson(url, timeout) {
+    const ms = timeout == null ? this.FETCH_MS : timeout;
+    const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timer = ctrl ? setTimeout(() => ctrl.abort(), ms) : null;
     try {
-      const parts = this.splitChunks(JSON.stringify(this.payload(data)));
-      return parts.length <= this.chunkIds().length;
+      const res = await fetch(this.cacheUrl(url), {
+        cache: "no-store",
+        signal: ctrl ? ctrl.signal : undefined
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  },
+  async loadFileCatalog() {
+    try {
+      return this.normalize(await this.fetchJson("menu.json", 5000));
     } catch (err) {
-      return false;
+      console.warn("MenuStore.loadFileCatalog", err);
+      return null;
     }
   },
-  async putChunk(id, text) {
-    let lastErr = null;
-    for (let attempt = 0; attempt < 4; attempt++) {
-      if (attempt) await this.sleep(220 * attempt);
-      try {
-        const res = await fetch(this.chunkUrl(id), {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: "yam-menu", data: { c: text || "" } })
-        });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return;
-      } catch (err) {
-        lastErr = err;
-      }
-    }
-    throw lastErr || new Error("putChunk failed");
+  async loadRemote() {
+    return this.loadFileCatalog();
   },
-  async saveRemote(data, previous) {
-    const ids = this.chunkIds();
-    if (!ids.length) return false;
-    const prevCat = previous || this.loadPublished() || this.defaultData();
-    const prev = {};
-    prevCat.menu.forEach((item) => { prev[item.id] = item.image; });
-    const send = async (body) => {
-      const text = JSON.stringify(this.payload(body));
-      const parts = this.splitChunks(text);
-      if (parts.length > ids.length) throw new Error("catalog too large");
-      for (let i = 0; i < ids.length; i++) {
-        await this.putChunk(ids[i], parts[i] || "");
-      }
-      let check = null;
-      for (let v = 0; v < 3; v++) {
-        if (v) await this.sleep(400);
-        check = await this.loadChunks();
-        if (check && this.fingerprint(check) === this.fingerprint(body)) return;
-      }
-      throw new Error("catalog verify failed");
+  async getFileMeta(path) {
+    const url = "https://api.github.com/repos/" + this.repo() + "/contents/" + path;
+    const res = await fetch(url, { headers: this.ghHeaders(), cache: "no-store" });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return res.json();
+  },
+  async putFile(path, contentBase64, message) {
+    const meta = await this.getFileMeta(path);
+    const body = {
+      message: message || "Update menu",
+      content: contentBase64,
+      branch: "main"
     };
-    const stripped = this.replaceHeavyImages(data, prev);
-    try {
-      if (!this.fitsRemote(data)) {
-        await send(stripped);
-        return "images-stripped";
+    if (meta && meta.sha) body.sha = meta.sha;
+    const url = "https://api.github.com/repos/" + this.repo() + "/contents/" + path;
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: Object.assign({ "Content-Type": "application/json" }, this.ghHeaders()),
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error("HTTP " + res.status + " " + errText.slice(0, 180));
+    }
+    return true;
+  },
+  async publishImages(data) {
+    let stripped = false;
+    const menu = [];
+    for (let i = 0; i < (data.menu || []).length; i++) {
+      const item = Object.assign({}, data.menu[i]);
+      if (item.image && String(item.image).slice(0, 5) === "data:") {
+        try {
+          const path = "assets/uploads/" + item.id + ".jpg";
+          const b64 = await this.dataUrlToBase64(item.image);
+          await this.putFile(path, b64, "Update dish photo " + item.name);
+          item.image = path + "?v=" + Date.now();
+        } catch (err) {
+          console.warn("MenuStore.publishImages", item.id, err);
+          stripped = true;
+          if (!item.image || String(item.image).slice(0, 5) === "data:") {
+            item.image = "assets/pastry-mix.jpg";
+          }
+        }
       }
-      await send(data);
-      return true;
+      menu.push(item);
+    }
+    return { data: Object.assign({}, data, { menu }), stripped };
+  },
+  async saveRemote(data) {
+    if (!this.token()) return false;
+    try {
+      const prepared = await this.publishImages(this.payload(data));
+      const json = JSON.stringify(prepared.data, null, 2);
+      await this.putFile("menu.json", this.utf8ToBase64(json), "Publish menu from admin");
+      return prepared.stripped ? "images-stripped" : true;
     } catch (err) {
       console.warn("MenuStore.saveRemote", err);
-      try {
-        await send(stripped);
-        return "images-stripped";
-      } catch (err2) {
-        console.warn("MenuStore.saveRemote retry", err2);
-        return false;
-      }
+      return false;
     }
   },
   load() {
@@ -296,24 +256,17 @@ window.MenuStore = {
     const local = this.loadLocal();
     const merged = this.overlay(remote, local) || local || this.defaultData();
     if (local && this.fingerprint(merged) !== this.fingerprint(remote || { menu: [] })) {
-      await this.saveRemote(merged, remote || local);
+      await this.saveRemote(merged);
     }
     this.saveLocal(merged);
     this.savePublished(merged);
     return merged;
   },
   async save(data) {
-    const previous = this.loadLocal() || this.loadPublished() || this.defaultData();
     const clean = this.payload(data);
     this.saveLocal(clean);
-    const remote = await this.saveRemote(clean, previous);
-    if (remote === "images-stripped") {
-      const prev = {};
-      previous.menu.forEach((item) => { prev[item.id] = item.image; });
-      this.savePublished(this.replaceHeavyImages(clean, prev));
-    } else if (remote) {
-      this.savePublished(clean);
-    }
+    const remote = await this.saveRemote(clean);
+    if (remote) this.savePublished(clean);
     return { local: true, remote };
   },
   async reset() {
@@ -321,6 +274,7 @@ window.MenuStore = {
     const fresh = this.defaultData();
     await this.saveRemote(fresh);
     this.saveLocal(fresh);
+    this.savePublished(fresh);
     return fresh;
   }
 };
