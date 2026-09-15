@@ -1,7 +1,7 @@
 window.YAM_STORE_KEY = "yam-menu-v1";
 
 window.MenuStore = {
-  CHUNK_BYTES: 800,
+  MAX_WRAPPED: 920,
   defaultData() {
     const src = window.YAM_DEFAULT || { categories: [], menu: [], extras: {}, assets: [] };
     return {
@@ -67,22 +67,33 @@ window.MenuStore = {
   saveLocal(data) {
     localStorage.setItem(window.YAM_STORE_KEY, JSON.stringify(this.payload(data)));
   },
-  splitBytes(text, maxBytes) {
-    const encoder = new TextEncoder();
+  wrappedBytes(piece) {
+    return new TextEncoder().encode(JSON.stringify({ name: "yam-menu", data: { c: piece || "" } })).length;
+  },
+  splitChunks(text) {
     const chunks = [];
-    let current = "";
-    for (const ch of text) {
-      const trial = current + ch;
-      if (encoder.encode(trial).length > maxBytes) {
-        if (!current) throw new Error("chunk too small");
-        chunks.push(current);
-        current = ch;
-      } else {
-        current = trial;
+    let i = 0;
+    while (i < text.length) {
+      let lo = 1;
+      let hi = Math.min(text.length - i, 700);
+      let ok = 1;
+      while (lo <= hi) {
+        const mid = (lo + hi) >> 1;
+        const piece = text.slice(i, i + mid);
+        if (this.wrappedBytes(piece) <= this.MAX_WRAPPED) {
+          ok = mid;
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
       }
+      chunks.push(text.slice(i, i + ok));
+      i += ok;
     }
-    if (current) chunks.push(current);
     return chunks;
+  },
+  async sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   },
   async fetchJson(url) {
     const res = await fetch(this.cacheUrl(url), { cache: "no-store" });
@@ -154,22 +165,33 @@ window.MenuStore = {
     };
   },
   async putChunk(id, text) {
-    const res = await fetch(this.chunkUrl(id), {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "yam-menu", data: { c: text || "" } })
-    });
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    let lastErr = null;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      if (attempt) await this.sleep(220 * attempt);
+      try {
+        const res = await fetch(this.chunkUrl(id), {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: "yam-menu", data: { c: text || "" } })
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return;
+      } catch (err) {
+        lastErr = err;
+      }
+    }
+    throw lastErr || new Error("putChunk failed");
   },
   async saveRemote(data) {
     const ids = this.chunkIds();
     if (!ids.length) return false;
     const send = async (body) => {
       const text = JSON.stringify(this.payload(body));
-      const parts = this.splitBytes(text, this.CHUNK_BYTES);
+      const parts = this.splitChunks(text);
       if (parts.length > ids.length) throw new Error("catalog too large");
-      const writes = ids.map((id, i) => this.putChunk(id, parts[i] || ""));
-      await Promise.all(writes);
+      for (let i = 0; i < ids.length; i++) {
+        await this.putChunk(ids[i], parts[i] || "");
+      }
     };
     try {
       await send(data);
