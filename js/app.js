@@ -78,12 +78,20 @@
     return money(item.price);
   }
 
+  const IMG_V = Date.now();
+
+  function dishImage(src) {
+    const s = String(src || "assets/pastry-mix.jpg");
+    if (s.indexOf("data:") === 0 || s.indexOf("?") >= 0) return s;
+    return s + "?v=" + IMG_V;
+  }
+
   function renderMenu() {
     const items = menu.filter((i) => currentCategory === "all" || i.category === currentCategory);
     els.grid.innerHTML = items.map((item) => `
       <article class="dish-card">
         <div class="dish-photo">
-          <img src="${item.image}" alt="${item.name}">
+          <img src="${dishImage(item.image)}" alt="${item.name}">
           <span class="dish-badge">${item.unit || (item.variants ? "عدة أحجام" : "حسب الطلب")}</span>
         </div>
         <div class="dish-body">
@@ -171,7 +179,7 @@
     activeItem = item;
     els.itemTitle.textContent = item.name;
     els.itemDesc.textContent = item.desc;
-    els.itemHero.style.backgroundImage = `url("${item.image}")`;
+    els.itemHero.style.backgroundImage = `url("${dishImage(item.image)}")`;
     els.itemHero.style.backgroundSize = "cover";
     els.itemHero.style.backgroundPosition = "center";
     renderItemForm(item);

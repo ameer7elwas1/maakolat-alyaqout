@@ -98,7 +98,7 @@ window.MenuStore = {
       id: item.id,
       name: item.name,
       desc: item.desc,
-      image: String(item.image || "").slice(0, 120),
+      image: String(item.image || "").length + ":" + String(item.image || "").slice(-48),
       price: item.price,
       unit: item.unit,
       step: item.step,
@@ -109,26 +109,30 @@ window.MenuStore = {
   overlay(remote, local) {
     if (!remote) return local;
     if (!local) return remote;
+    const remoteNewer = Number(remote.updatedAt || 0) >= Number(local.updatedAt || 0);
+    const primary = remoteNewer ? remote : local;
+    const secondary = remoteNewer ? local : remote;
     const byId = {};
-    remote.menu.forEach((item) => { byId[item.id] = item; });
-    local.menu.forEach((item) => { byId[item.id] = item; });
+    secondary.menu.forEach((item) => { byId[item.id] = item; });
+    primary.menu.forEach((item) => { byId[item.id] = item; });
     const seen = {};
     const menu = [];
-    remote.menu.forEach((item) => {
+    primary.menu.forEach((item) => {
       menu.push(byId[item.id]);
       seen[item.id] = true;
     });
-    local.menu.forEach((item) => {
+    secondary.menu.forEach((item) => {
       if (item && item.id && !seen[item.id]) menu.push(item);
     });
-    const assets = (remote.assets || []).slice();
-    (local.assets || []).concat(local.menu.map((i) => i.image)).forEach((src) => {
+    const assets = (primary.assets || []).slice();
+    (secondary.assets || []).concat(secondary.menu.map((i) => i.image)).forEach((src) => {
       if (src && assets.indexOf(src) < 0 && String(src).indexOf("data:") !== 0) assets.push(src);
     });
     return {
-      categories: (local.categories && local.categories.length) ? local.categories : remote.categories,
+      categories: (primary.categories && primary.categories.length) ? primary.categories : secondary.categories,
       menu,
-      assets
+      assets,
+      updatedAt: Math.max(Number(remote.updatedAt || 0), Number(local.updatedAt || 0))
     };
   },
   utf8ToBase64(text) {
@@ -210,36 +214,44 @@ window.MenuStore = {
   async publishImages(data) {
     let stripped = false;
     const menu = [];
+    const assets = Array.isArray(data.assets) ? data.assets.slice() : [];
     for (let i = 0; i < (data.menu || []).length; i++) {
       const item = Object.assign({}, data.menu[i]);
+      const keep = item._keepImage || "";
+      delete item._keepImage;
       if (item.image && String(item.image).slice(0, 5) === "data:") {
         try {
-          const path = "assets/uploads/" + item.id + ".jpg";
+          const stamp = Date.now();
+          const path = "assets/uploads/" + item.id + "-" + stamp + ".jpg";
           const b64 = await this.dataUrlToBase64(item.image);
-          await this.putFile(path, b64, "Update dish photo " + item.name);
-          item.image = path + "?v=" + Date.now();
+          await this.putFile(path, b64, "Update dish photo");
+          item.image = path + "?v=" + stamp;
+          if (assets.indexOf(path) < 0) assets.push(path);
         } catch (err) {
           console.warn("MenuStore.publishImages", item.id, err);
           stripped = true;
-          if (!item.image || String(item.image).slice(0, 5) === "data:") {
-            item.image = "assets/pastry-mix.jpg";
-          }
+          item.image = (keep && String(keep).indexOf("data:") !== 0)
+            ? keep
+            : "assets/pastry-mix.jpg";
         }
+      } else if (item.image) {
+        const path = String(item.image).split("?")[0];
+        if (path.indexOf("assets/") === 0 && assets.indexOf(path) < 0) assets.push(path);
       }
       menu.push(item);
     }
-    return { data: Object.assign({}, data, { menu }), stripped };
+    return { data: Object.assign({}, data, { menu, assets }), stripped };
   },
   async saveRemote(data) {
-    if (!this.token()) return false;
+    if (!this.token()) return null;
     try {
       const prepared = await this.publishImages(this.payload(data));
       const json = JSON.stringify(prepared.data, null, 2);
       await this.putFile("menu.json", this.utf8ToBase64(json), "Publish menu from admin");
-      return prepared.stripped ? "images-stripped" : true;
+      return prepared;
     } catch (err) {
       console.warn("MenuStore.saveRemote", err);
-      return false;
+      return null;
     }
   },
   load() {
@@ -255,8 +267,14 @@ window.MenuStore = {
     const remote = await this.loadRemote();
     const local = this.loadLocal();
     const merged = this.overlay(remote, local) || local || this.defaultData();
-    if (local && this.fingerprint(merged) !== this.fingerprint(remote || { menu: [] })) {
-      await this.saveRemote(merged);
+    const localNewer = local && Number(local.updatedAt || 0) > Number(remote && remote.updatedAt || 0);
+    if (localNewer && this.fingerprint(merged) !== this.fingerprint(remote || { menu: [] })) {
+      const prepared = await this.saveRemote(merged);
+      if (prepared && prepared.data) {
+        this.saveLocal(prepared.data);
+        this.savePublished(prepared.data);
+        return prepared.data;
+      }
     }
     this.saveLocal(merged);
     this.savePublished(merged);
@@ -265,9 +283,17 @@ window.MenuStore = {
   async save(data) {
     const clean = this.payload(data);
     this.saveLocal(clean);
-    const remote = await this.saveRemote(clean);
-    if (remote) this.savePublished(clean);
-    return { local: true, remote };
+    const prepared = await this.saveRemote(clean);
+    if (prepared && prepared.data) {
+      this.saveLocal(prepared.data);
+      this.savePublished(prepared.data);
+      return {
+        local: true,
+        remote: prepared.stripped ? "images-stripped" : true,
+        data: prepared.data
+      };
+    }
+    return { local: true, remote: false, data: clean };
   },
   async reset() {
     localStorage.removeItem(window.YAM_STORE_KEY);

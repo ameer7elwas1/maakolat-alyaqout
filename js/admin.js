@@ -16,6 +16,41 @@
   let editingId = null;
   const publishStatus = document.getElementById("publish-status");
 
+  function imageKey(src) {
+    return String(src || "").split("?")[0];
+  }
+
+  function dishImage(src) {
+    const s = String(src || "assets/pastry-mix.jpg");
+    if (s.indexOf("data:") === 0 || s.indexOf("?") >= 0) return s;
+    return s + "?v=" + (catalog.updatedAt || 1);
+  }
+
+  function previewEl() {
+    return document.getElementById("dish-image-preview");
+  }
+
+  function showPreview(src) {
+    const img = previewEl();
+    if (!img) return;
+    if (!src) {
+      img.hidden = true;
+      img.removeAttribute("src");
+      return;
+    }
+    img.hidden = false;
+    img.src = dishImage(src);
+  }
+
+  function currentFormImage() {
+    return form.dataset.uploadedImage || form.imageUrl.value.trim() || form.image.value.trim() || "";
+  }
+
+  function clearUpload() {
+    delete form.dataset.uploadedImage;
+    form.imageFile.value = "";
+  }
+
   const money = (n) => {
     if (n == null) return "حسب الكمية";
     return `${Number(n).toLocaleString("ar-IQ")} د.ع`;
@@ -28,7 +63,7 @@
   function toast(msg) {
     toastEl.textContent = msg;
     toastEl.classList.add("show");
-    setTimeout(() => toastEl.classList.remove("show"), 1800);
+    setTimeout(() => toastEl.classList.remove("show"), 2600);
   }
 
   function expectedPin() {
@@ -62,11 +97,10 @@
       .filter((c) => c.id !== "all")
       .map((c) => `<option value="${esc(c.id)}">${esc(c.label)}</option>`)
       .join("");
-    const assets = (catalog.assets || []).slice();
-    catalog.menu.forEach((item) => {
-      if (item.image && !assets.includes(item.image) && !String(item.image).startsWith("data:")) {
-        assets.push(item.image);
-      }
+    const assets = [];
+    (catalog.assets || []).concat((catalog.menu || []).map((item) => item.image)).forEach((src) => {
+      const path = imageKey(src);
+      if (path && path.indexOf("data:") !== 0 && assets.indexOf(path) < 0) assets.push(path);
     });
     form.image.innerHTML = `<option value="">— اختَر صورة —</option>` +
       assets.map((src) => `<option value="${esc(src)}">${esc(src.replace("assets/", ""))}</option>`).join("");
@@ -80,7 +114,7 @@
     }
     listEl.innerHTML = catalog.menu.map((item) => `
       <article class="admin-dish">
-        <img src="${esc(item.image || "assets/pastry-mix.jpg")}" alt="">
+        <img src="${esc(dishImage(item.image))}" alt="">
         <div>
           <strong>${esc(item.name)}</strong>
           <p class="muted">${esc(catLabel(item.category))} · ${item.variants && item.variants.length ? "عدة أحجام" : money(item.price)}</p>
@@ -110,18 +144,23 @@
     document.getElementById("dish-form-eyebrow").textContent = item ? "تعديل" : "صنف جديد";
     document.getElementById("dish-form-title").textContent = item ? "تعديل الصنف" : "إضافة صنف";
     form.reset();
+    clearUpload();
     form.id.value = item ? item.id : "";
     form.name.value = item ? item.name : "";
     form.desc.value = item ? item.desc || "" : "";
     form.category.value = item ? item.category : (catalog.categories.find((c) => c.id !== "all") || {}).id || "";
     form.extrasKey.value = item ? (item.extrasKey || "savory") : "savory";
-    form.image.value = item && [...form.image.options].some((o) => o.value === item.image) ? item.image : "";
-    form.imageUrl.value = item && !form.image.value ? (item.image || "") : "";
+    const rawImage = item ? String(item.image || "") : "";
+    const pathOnly = imageKey(rawImage);
+    const matchOpt = [...form.image.options].find((o) => o.value && (o.value === rawImage || o.value === pathOnly));
+    form.image.value = matchOpt ? matchOpt.value : "";
+    form.imageUrl.value = matchOpt ? "" : rawImage;
     form.unit.value = item ? item.unit || "" : "";
     form.kilo.checked = !!(item && item.step);
     form.price.value = item && item.price != null ? item.price : "";
     variantRows.innerHTML = "";
     (item && item.variants ? item.variants : []).forEach((v) => variantRows.appendChild(variantRow(v)));
+    showPreview(rawImage || "");
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
     overlay.hidden = false;
@@ -153,6 +192,8 @@
 
   async function persist() {
     const result = await window.MenuStore.save(catalog);
+    if (result.data) catalog = result.data;
+    fillSelects();
     renderList();
     setPublishStatus(!!result.remote);
     return result;
@@ -212,26 +253,41 @@
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
-        const max = 480;
+        const max = 900;
         const scale = Math.min(1, max / img.width, max / img.height);
         const canvas = document.createElement("canvas");
         canvas.width = Math.max(1, Math.round(img.width * scale));
         canvas.height = Math.max(1, Math.round(img.height * scale));
         canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", 0.55));
+        resolve(canvas.toDataURL("image/jpeg", 0.72));
       };
       img.onerror = () => resolve(dataUrl);
       img.src = dataUrl;
     });
   }
 
+  form.image.addEventListener("change", () => {
+    clearUpload();
+    if (form.image.value) form.imageUrl.value = "";
+    showPreview(currentFormImage());
+  });
+
+  form.imageUrl.addEventListener("input", () => {
+    if (form.imageUrl.value.trim()) {
+      clearUpload();
+      form.image.value = "";
+    }
+    showPreview(currentFormImage());
+  });
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const submitBtn = form.querySelector('[type="submit"]');
     const variants = collectVariants();
     const priceRaw = form.price.value.trim();
     const uploaded = form.dataset.uploadedImage || "";
     const previous = (catalog.menu.find((i) => i.id === form.id.value) || {}).image || "";
-    let image = uploaded || form.imageUrl.value.trim() || form.image.value;
+    let image = uploaded || form.imageUrl.value.trim() || form.image.value.trim() || previous;
     if (image && String(image).slice(0, 5) === "data:") {
       image = await compressImage(image);
     }
@@ -251,6 +307,7 @@
       price: variants.length ? undefined : (priceRaw === "" ? null : Number(priceRaw)),
       variants: variants.length ? variants : undefined
     };
+    if (uploaded) item._keepImage = previous;
     if (!item.step) delete item.step;
     if (!item.variants) delete item.variants;
     if (item.price == null && !item.variants) item.price = null;
@@ -258,18 +315,19 @@
     const idx = catalog.menu.findIndex((i) => i.id === item.id);
     if (idx >= 0) catalog.menu[idx] = item;
     else catalog.menu.push(item);
-    delete form.dataset.uploadedImage;
-    const result = await persist();
+    clearUpload();
+    if (submitBtn) submitBtn.disabled = true;
+    let result;
+    try {
+      result = await persist();
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
     closeModal();
     if (result.remote === "images-stripped") {
-      const published = catalog.menu.find((i) => i.id === item.id);
-      if (published && previous && String(previous).indexOf("data:") !== 0) {
-        published.image = previous;
-        renderList();
-      }
-      toast("تم حفظ التعديل للزبائن. الصورة المرفوعة كبيرة — اختَر صورة جاهزة من القائمة");
+      toast("تم حفظ الصنف. الصورة الجديدة لم تُرفع — جرّب صورة أصغر أو اختَر صورة جاهزة");
     } else if (result.remote) {
-      toast("تم حفظ التعديل ويظهر الآن لكل الزبائن");
+      toast("تم حفظ الصورة والتعديل. حدّث صفحة الزبائن بعد دقيقة");
     } else {
       toast("حُفظ على هذا الجهاز فقط. تحقق من الإنترنت واحفظ مرة ثانية");
     }
@@ -278,15 +336,18 @@
   form.imageFile.addEventListener("change", () => {
     const file = form.imageFile.files[0];
     if (!file) return;
-    if (file.size > 1200000) {
-      toast("الصورة كبيرة. اختَر صورة أصغر من 1 ميغابايت");
+    if (file.size > 6000000) {
+      toast("الصورة كبيرة. اختَر صورة أصغر من 6 ميغابايت");
       form.imageFile.value = "";
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => {
-      form.dataset.uploadedImage = reader.result;
-      toast("تم تجهيز الصورة");
+    reader.onload = async () => {
+      form.image.value = "";
+      form.imageUrl.value = "";
+      form.dataset.uploadedImage = await compressImage(reader.result);
+      showPreview(form.dataset.uploadedImage);
+      toast("تم تجهيز الصورة الجديدة");
     };
     reader.readAsDataURL(file);
   });
