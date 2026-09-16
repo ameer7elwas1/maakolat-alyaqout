@@ -59,6 +59,9 @@ window.MenuStore = {
     const cleanMenu = (data.menu || []).map((item) => {
       const copy = Object.assign({}, item);
       delete copy.extras;
+      if (copy.image && String(copy.image).indexOf("assets/uploads/") === 0) {
+        copy.image = this.mediaUrl(copy.image);
+      }
       return copy;
     });
     return {
