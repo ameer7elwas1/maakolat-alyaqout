@@ -270,16 +270,6 @@
       "extrasKey": "savory"
     },
     {
-      "id": "dish-1789491571122",
-      "name": "امير",
-      "desc": "",
-      "category": "special",
-      "extrasKey": "grill",
-      "image": "assets/uploads/dish-1789491571122.jpg?v=1789492215798",
-      "unit": "",
-      "price": 500
-    },
-    {
       "id": "dish-1789484692249",
       "name": "admin",
       "desc": "admin",
@@ -329,7 +319,8 @@
     "assets/qatayef.jpg",
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg",
-    "assets/uploads/dish-1789491571122.jpg?v=1789492215798"
+    "assets/uploads/dish-1789491571122.jpg?v=1789492215798",
+    "assets/uploads/dish-1789486426354.jpg"
   ],
-  "updatedAt": 1789499671864
+  "updatedAt": 1789566944420
 }
