@@ -81,6 +81,9 @@
   const IMG_V = Date.now();
 
   function dishImage(src) {
+    if (window.MenuStore && window.MenuStore.mediaUrl) {
+      return window.MenuStore.mediaUrl(src, IMG_V);
+    }
     const s = String(src || "assets/pastry-mix.jpg");
     if (s.indexOf("data:") === 0 || s.indexOf("?") >= 0) return s;
     return s + "?v=" + IMG_V;

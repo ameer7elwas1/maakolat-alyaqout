@@ -21,6 +21,9 @@
   }
 
   function dishImage(src) {
+    if (window.MenuStore && window.MenuStore.mediaUrl) {
+      return window.MenuStore.mediaUrl(src, catalog.updatedAt || 1);
+    }
     const s = String(src || "assets/pastry-mix.jpg");
     if (s.indexOf("data:") === 0 || s.indexOf("?") >= 0) return s;
     return s + "?v=" + (catalog.updatedAt || 1);

@@ -184,6 +184,19 @@ window.MenuStore = {
   async loadRemote() {
     return this.loadFileCatalog();
   },
+  mediaUrl(src, cacheBust) {
+    const fallback = "assets/pastry-mix.jpg";
+    const s = String(src || fallback);
+    if (s.indexOf("data:") === 0) return s;
+    if (/^https?:\/\//i.test(s)) return s;
+    const path = s.split("?")[0];
+    const query = s.indexOf("?") >= 0 ? s.slice(s.indexOf("?")) : "";
+    if (path.indexOf("assets/uploads/") === 0) {
+      return "https://raw.githubusercontent.com/" + this.repo() + "/main/" + path + (query || (cacheBust ? "?v=" + cacheBust : ""));
+    }
+    if (query) return s;
+    return cacheBust ? path + "?v=" + cacheBust : s;
+  },
   async getFileMeta(path) {
     const url = "https://api.github.com/repos/" + this.repo() + "/contents/" + path;
     const res = await fetch(url, { headers: this.ghHeaders(), cache: "no-store" });
@@ -191,25 +204,36 @@ window.MenuStore = {
     if (!res.ok) throw new Error("HTTP " + res.status);
     return res.json();
   },
-  async putFile(path, contentBase64, message) {
-    const meta = await this.getFileMeta(path);
-    const body = {
-      message: message || "Update menu",
-      content: contentBase64,
-      branch: "main"
-    };
-    if (meta && meta.sha) body.sha = meta.sha;
+  async putFile(path, contentBase64, message, opts) {
     const url = "https://api.github.com/repos/" + this.repo() + "/contents/" + path;
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: Object.assign({ "Content-Type": "application/json" }, this.ghHeaders()),
-      body: JSON.stringify(body)
-    });
+    const send = async (sha) => {
+      const body = {
+        message: message || "Update menu",
+        content: contentBase64,
+        branch: "main"
+      };
+      if (sha) body.sha = sha;
+      return fetch(url, {
+        method: "PUT",
+        headers: Object.assign({ "Content-Type": "application/json" }, this.ghHeaders()),
+        body: JSON.stringify(body)
+      });
+    };
+    let sha = null;
+    if (!(opts && opts.newFile)) {
+      const meta = await this.getFileMeta(path);
+      sha = meta && meta.sha;
+    }
+    let res = await send(sha);
+    if ((res.status === 409 || res.status === 422) && !(opts && opts.newFile && sha)) {
+      const meta = await this.getFileMeta(path);
+      res = await send(meta && meta.sha);
+    }
     if (!res.ok) {
       const errText = await res.text();
       throw new Error("HTTP " + res.status + " " + errText.slice(0, 180));
     }
-    return true;
+    return res.json();
   },
   async publishImages(data) {
     let stripped = false;
@@ -224,8 +248,8 @@ window.MenuStore = {
           const stamp = Date.now();
           const path = "assets/uploads/" + item.id + "-" + stamp + ".jpg";
           const b64 = await this.dataUrlToBase64(item.image);
-          await this.putFile(path, b64, "Update dish photo");
-          item.image = path + "?v=" + stamp;
+          await this.putFile(path, b64, "Update dish photo", { newFile: true });
+          item.image = this.mediaUrl(path, stamp);
           if (assets.indexOf(path) < 0) assets.push(path);
         } catch (err) {
           console.warn("MenuStore.publishImages", item.id, err);
