@@ -253,12 +253,13 @@
     },
     {
       "id": "grilled-fish",
-      "category": "special",
       "name": "سمك شوي",
       "desc": "مع التمن الأحمر والطرشي. السعر حسب الكمية.",
-      "price": null,
-      "image": "assets/grilled-fish.jpg",
-      "extrasKey": "grill"
+      "category": "special",
+      "extrasKey": "grill",
+      "image": "assets/uploads/grilled-fish-1789567138608.jpg?v=1789567138608",
+      "unit": "",
+      "price": null
     },
     {
       "id": "qouzi",
@@ -291,7 +292,8 @@
     "assets/uploads/dish-1789491571122.jpg?v=1789492215798",
     "assets/uploads/dish-1789486426354.jpg",
     "assets/uploads/dish-1789486426354.jpg?v=1789499686583",
-    "assets/uploads/dish-1789491571122.jpg"
+    "assets/uploads/dish-1789491571122.jpg",
+    "assets/uploads/grilled-fish-1789567138608.jpg"
   ],
-  "updatedAt": 1789567059091
+  "updatedAt": 1789567138607
 }
