@@ -306,7 +306,7 @@
       "desc": "مابية حيل نعسانه",
       "category": "mains",
       "extrasKey": "grill",
-      "image": "assets/uploads/dish-1789486426354.jpg?v=1789568904566",
+      "image": "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/dish-1789486426354-1789568916960.jpg?v=1789568916960",
       "unit": "",
       "price": null
     }
@@ -335,7 +335,9 @@
     "assets/uploads/dish-1789491571122.jpg",
     "assets/uploads/grilled-fish-1789567138608.jpg",
     "assets/uploads/grilled-fish-1789567138608.jpg?v=1789567138608",
-    "assets/uploads/kabsa-1789568859080.jpg"
+    "assets/uploads/kabsa-1789568859080.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/kabsa-1789568859080.jpg?v=1789568859080",
+    "assets/uploads/dish-1789486426354-1789568916960.jpg"
   ],
-  "updatedAt": 1789568901888
+  "updatedAt": 1789568916959
 }
