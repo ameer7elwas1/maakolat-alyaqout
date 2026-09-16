@@ -270,16 +270,6 @@
       "extrasKey": "savory"
     },
     {
-      "id": "dish-1789491571122",
-      "name": "امير",
-      "desc": "",
-      "category": "special",
-      "extrasKey": "grill",
-      "image": "assets/uploads/dish-1789491571122.jpg?v=1789492215798",
-      "unit": "",
-      "price": 500
-    },
-    {
       "id": "dish-1789484692249",
       "name": "admin",
       "desc": "admin",
@@ -334,5 +324,5 @@
     "assets/uploads/dish-1789486426354.jpg?v=1789499686583",
     "assets/uploads/dish-1789491571122.jpg"
   ],
-  "updatedAt": 1789567017977
+  "updatedAt": 1789567032527
 }
