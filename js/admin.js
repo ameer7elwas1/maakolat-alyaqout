@@ -117,7 +117,7 @@
     }
     listEl.innerHTML = catalog.menu.map((item) => `
       <article class="admin-dish">
-        <img src="${esc(dishImage(item.image))}" alt="">
+        <img src="${esc(dishImage(item.image))}" alt="" onerror="this.onerror=null;this.src='assets/pastry-mix.jpg'">
         <div>
           <strong>${esc(item.name)}</strong>
           <p class="muted">${esc(catLabel(item.category))} · ${item.variants && item.variants.length ? "عدة أحجام" : money(item.price)}</p>

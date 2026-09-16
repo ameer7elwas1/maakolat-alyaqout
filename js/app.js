@@ -94,7 +94,7 @@
     els.grid.innerHTML = items.map((item) => `
       <article class="dish-card">
         <div class="dish-photo">
-          <img src="${dishImage(item.image)}" alt="${item.name}">
+          <img src="${dishImage(item.image)}" alt="${item.name}" onerror="this.onerror=null;this.src='assets/pastry-mix.jpg'">
           <span class="dish-badge">${item.unit || (item.variants ? "عدة أحجام" : "حسب الطلب")}</span>
         </div>
         <div class="dish-body">

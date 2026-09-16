@@ -47,11 +47,12 @@ window.MenuStore = {
       menu: inner.menu.map((item) => {
         const copy = Object.assign({}, item);
         delete copy.extras;
+        copy.image = this.mediaUrl(copy.image);
         return copy;
       }),
-      assets: Array.isArray(inner.assets) && inner.assets.length
+      assets: (Array.isArray(inner.assets) && inner.assets.length
         ? inner.assets
-        : (fallback.assets || []),
+        : (fallback.assets || [])).map((src) => this.mediaUrl(src)),
       updatedAt: inner.updatedAt || 0
     };
   },
@@ -59,9 +60,7 @@ window.MenuStore = {
     const cleanMenu = (data.menu || []).map((item) => {
       const copy = Object.assign({}, item);
       delete copy.extras;
-      if (copy.image && String(copy.image).indexOf("assets/uploads/") === 0) {
-        copy.image = this.mediaUrl(copy.image);
-      }
+      copy.image = this.mediaUrl(copy.image);
       return copy;
     });
     return {
@@ -191,12 +190,15 @@ window.MenuStore = {
     const fallback = "assets/pastry-mix.jpg";
     const s = String(src || fallback);
     if (s.indexOf("data:") === 0) return s;
+    const uploads = s.match(/assets\/uploads\/[A-Za-z0-9._-]+/);
+    if (uploads) {
+      const path = uploads[0];
+      const query = s.indexOf("?") >= 0 ? s.slice(s.indexOf("?")) : (cacheBust ? "?v=" + cacheBust : "");
+      return "https://raw.githubusercontent.com/" + this.repo() + "/main/" + path + query;
+    }
     if (/^https?:\/\//i.test(s)) return s;
     const path = s.split("?")[0];
     const query = s.indexOf("?") >= 0 ? s.slice(s.indexOf("?")) : "";
-    if (path.indexOf("assets/uploads/") === 0) {
-      return "https://raw.githubusercontent.com/" + this.repo() + "/main/" + path + (query || (cacheBust ? "?v=" + cacheBust : ""));
-    }
     if (query) return s;
     return cacheBust ? path + "?v=" + cacheBust : s;
   },
@@ -262,6 +264,7 @@ window.MenuStore = {
             : "assets/pastry-mix.jpg";
         }
       } else if (item.image) {
+        item.image = this.mediaUrl(item.image);
         const path = String(item.image).split("?")[0];
         if (path.indexOf("assets/") === 0 && assets.indexOf(path) < 0) assets.push(path);
       }
