@@ -270,27 +270,6 @@
       "extrasKey": "savory"
     },
     {
-      "id": "dish-1789484692249",
-      "name": "admin",
-      "desc": "admin",
-      "category": "sweets",
-      "extrasKey": "chicken",
-      "image": "assets/pastry-mix.jpg",
-      "unit": "",
-      "variants": [
-        {
-          "id": "v1",
-          "label": "1",
-          "price": 22000
-        },
-        {
-          "id": "v2",
-          "label": "2",
-          "price": 33000
-        }
-      ]
-    },
-    {
       "id": "dish-1789486426354",
       "name": "مطبك نوم وعجز",
       "desc": "مابية حيل نعسانه",
@@ -324,5 +303,5 @@
     "assets/uploads/dish-1789486426354.jpg?v=1789499686583",
     "assets/uploads/dish-1789491571122.jpg"
   ],
-  "updatedAt": 1789567050276
+  "updatedAt": 1789567054394
 }
