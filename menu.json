@@ -268,6 +268,47 @@
       "price": null,
       "image": "assets/qouzi.jpg",
       "extrasKey": "savory"
+    },
+    {
+      "id": "dish-1789491571122",
+      "name": "امير",
+      "desc": "",
+      "category": "special",
+      "extrasKey": "grill",
+      "image": "assets/uploads/dish-1789491571122.jpg?v=1789492215798",
+      "unit": "",
+      "price": 500
+    },
+    {
+      "id": "dish-1789484692249",
+      "name": "admin",
+      "desc": "admin",
+      "category": "sweets",
+      "extrasKey": "chicken",
+      "image": "assets/pastry-mix.jpg",
+      "unit": "",
+      "variants": [
+        {
+          "id": "v1",
+          "label": "1",
+          "price": 22000
+        },
+        {
+          "id": "v2",
+          "label": "2",
+          "price": 33000
+        }
+      ]
+    },
+    {
+      "id": "dish-1789486426354",
+      "name": "مطبك نوم وعجز",
+      "desc": "مابية حيل نعسانه",
+      "category": "mains",
+      "extrasKey": "grill",
+      "image": "assets/uploads/dish-1789486426354.jpg?v=1789499686583",
+      "unit": "",
+      "price": null
     }
   ],
   "assets": [
@@ -289,7 +330,9 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg",
     "assets/uploads/dish-1789491571122.jpg?v=1789492215798",
-    "assets/uploads/dish-1789486426354.jpg"
+    "assets/uploads/dish-1789486426354.jpg",
+    "assets/uploads/dish-1789486426354.jpg?v=1789499686583",
+    "assets/uploads/dish-1789491571122.jpg"
   ],
-  "updatedAt": 1789566951687
+  "updatedAt": 1789567017977
 }
