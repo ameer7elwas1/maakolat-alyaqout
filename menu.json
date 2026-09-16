@@ -268,16 +268,6 @@
       "price": null,
       "image": "assets/qouzi.jpg",
       "extrasKey": "savory"
-    },
-    {
-      "id": "dish-1789486426354",
-      "name": "مطبك نوم وعجز",
-      "desc": "مابية حيل نعسانه",
-      "category": "mains",
-      "extrasKey": "grill",
-      "image": "assets/uploads/dish-1789486426354.jpg?v=1789499686583",
-      "unit": "",
-      "price": null
     }
   ],
   "assets": [
@@ -303,5 +293,5 @@
     "assets/uploads/dish-1789486426354.jpg?v=1789499686583",
     "assets/uploads/dish-1789491571122.jpg"
   ],
-  "updatedAt": 1789567054394
+  "updatedAt": 1789567059091
 }
