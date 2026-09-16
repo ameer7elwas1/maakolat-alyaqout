@@ -92,13 +92,13 @@
     },
     {
       "id": "kabsa",
-      "category": "mains",
       "name": "كبسة الدجاج والمقلوبة",
       "desc": "طبق رئيسي جاهز للسفرة.",
-      "price": 20000,
+      "category": "mains",
+      "extrasKey": "grill",
+      "image": "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/kabsa-1789568859080.jpg?v=1789568859080",
       "unit": "صينية",
-      "image": "assets/kabsa.jpg",
-      "extrasKey": "grill"
+      "price": 20000
     },
     {
       "id": "chicken-tray",
@@ -293,7 +293,9 @@
     "assets/uploads/dish-1789486426354.jpg",
     "assets/uploads/dish-1789486426354.jpg?v=1789499686583",
     "assets/uploads/dish-1789491571122.jpg",
-    "assets/uploads/grilled-fish-1789567138608.jpg"
+    "assets/uploads/grilled-fish-1789567138608.jpg",
+    "assets/uploads/grilled-fish-1789567138608.jpg?v=1789567138608",
+    "assets/uploads/kabsa-1789568859080.jpg"
   ],
-  "updatedAt": 1789567180891
+  "updatedAt": 1789568859080
 }
