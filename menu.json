@@ -259,12 +259,19 @@
     },
     {
       "id": "grilled-fish",
-      "category": "special",
       "name": "سمك شوي",
       "desc": "مع التمن الأحمر والطرشي. السعر حسب الكمية.",
-      "price": null,
-      "image": "assets/grilled-fish.jpg",
-      "extrasKey": "grill"
+      "category": "special",
+      "extrasKey": "grill",
+      "extraIds": [
+        "sofra",
+        "pickles",
+        "rice",
+        "greens"
+      ],
+      "image": "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/grilled-fish-1789817022709.jpg?v=1789817022709",
+      "unit": "",
+      "price": null
     },
     {
       "id": "qouzi",
@@ -306,7 +313,8 @@
     "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/kabsa-1789568859080.jpg",
     "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/pastry-mix.jpg",
     "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/qatayef-1789569051970.jpg?v=1789569051970",
-    "assets/uploads/qatayef-1789816939348.jpg"
+    "assets/uploads/qatayef-1789816939348.jpg",
+    "assets/uploads/grilled-fish-1789817022709.jpg"
   ],
-  "updatedAt": 1789816939348
+  "updatedAt": 1789817022709
 }
