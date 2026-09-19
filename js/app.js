@@ -10,6 +10,8 @@
   const els = {
     grid: document.getElementById("menu-grid"),
     cats: document.getElementById("category-bar"),
+    featured: document.getElementById("featured-row"),
+    search: document.getElementById("menu-search"),
     overlay: document.getElementById("overlay"),
     cartDrawer: document.getElementById("cart-drawer"),
     cartItems: document.getElementById("cart-items"),
@@ -34,6 +36,7 @@
   };
 
   let currentCategory = "all";
+  let searchQuery = "";
   let activeItem = null;
   let qty = 1;
   let customerLocation = null;
@@ -90,7 +93,18 @@
   }
 
   function renderMenu() {
-    const items = menu.filter((i) => currentCategory === "all" || i.category === currentCategory);
+    const q = searchQuery.trim();
+    const items = menu.filter((i) => {
+      const inCat = currentCategory === "all" || i.category === currentCategory;
+      if (!inCat) return false;
+      if (!q) return true;
+      const hay = `${i.name || ""} ${i.desc || ""} ${i.unit || ""}`.toLowerCase();
+      return hay.indexOf(q.toLowerCase()) >= 0;
+    });
+    if (!items.length) {
+      els.grid.innerHTML = `<div class="empty-search">لا يوجد صنف بهذا الاسم في التصنيف الحالي.</div>`;
+      return;
+    }
     els.grid.innerHTML = items.map((item) => `
       <article class="dish-card">
         <div class="dish-photo">
@@ -104,6 +118,30 @@
           <button class="btn btn-primary" data-add="${item.id}" type="button">أضف للسلة</button>
         </div>
       </article>
+    `).join("");
+  }
+
+  function featuredItems() {
+    const ids = ["pastry-mix", "dolma", "kleija-free-fat", "kabsa"];
+    const picked = ids.map((id) => menu.find((i) => i.id === id)).filter(Boolean);
+    return picked.length ? picked : menu.slice(0, 4);
+  }
+
+  function renderFeatured() {
+    if (!els.featured) return;
+    const items = featuredItems();
+    if (!items.length) {
+      els.featured.innerHTML = "";
+      return;
+    }
+    els.featured.innerHTML = items.map((item) => `
+      <button class="featured-card" type="button" data-add="${item.id}" aria-label="أضف ${item.name}">
+        <img src="${dishImage(item.image)}" alt="" onerror="this.onerror=null;this.src='assets/pastry-mix.jpg'">
+        <div>
+          <strong>${item.name}</strong>
+          <span>${priceLabel(item)}</span>
+        </div>
+      </button>
     `).join("");
   }
 
@@ -368,6 +406,31 @@
       const digits = String(cfg.whatsapp).replace(/[^\d]/g, "");
       phoneLink.href = `https://wa.me/${digits}`;
       phoneLink.textContent = cfg.phoneDisplay || "07869789710";
+      const wa = document.getElementById("wa-float");
+      if (wa) wa.href = `https://wa.me/${digits}`;
+    }
+
+    const header = document.getElementById("top");
+    if (header) {
+      const onScroll = () => header.classList.toggle("is-scrolled", window.scrollY > 10);
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    }
+
+    if (els.search) {
+      els.search.addEventListener("input", () => {
+        searchQuery = els.search.value || "";
+        renderMenu();
+      });
+    }
+
+    if (els.featured) {
+      els.featured.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-add]");
+        if (!btn) return;
+        const item = menu.find((i) => i.id === btn.dataset.add);
+        if (item) openItem(item);
+      });
     }
 
     els.cats.addEventListener("click", (e) => {
@@ -452,6 +515,7 @@
   function start() {
     loadCatalog();
     renderCategories();
+    renderFeatured();
     renderMenu();
     renderCart();
     bind();
@@ -460,6 +524,7 @@
         if (!data || !data.menu || !data.menu.length) return;
         applyCatalog(data);
         renderCategories();
+        renderFeatured();
         renderMenu();
       };
       window.MenuStore.refreshPublished().then(applyLive).catch((err) => console.warn("refreshPublished", err));
