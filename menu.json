@@ -105,19 +105,24 @@
     },
     {
       "id": "chicken-tray",
-      "category": "mains",
       "name": "صينية الدجاج",
       "desc": "مع الملحقات: طرشي وخضرة وتتبيلة الدجاج.",
-      "image": "assets/chicken-tray.jpg",
+      "category": "mains",
       "extrasKey": "chicken",
+      "extraIds": [
+        "sofra",
+        "extraPickles"
+      ],
+      "image": "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/chicken-tray-1789817044734.jpg?v=1789817044734",
+      "unit": "",
       "variants": [
         {
-          "id": "full",
+          "id": "v1",
           "label": "صينية كاملة مع الملحقات",
           "price": 15000
         },
         {
-          "id": "half",
+          "id": "v2",
           "label": "نص صينية",
           "price": 8000
         }
@@ -314,7 +319,8 @@
     "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/pastry-mix.jpg",
     "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/qatayef-1789569051970.jpg?v=1789569051970",
     "assets/uploads/qatayef-1789816939348.jpg",
-    "assets/uploads/grilled-fish-1789817022709.jpg"
+    "assets/uploads/grilled-fish-1789817022709.jpg",
+    "assets/uploads/chicken-tray-1789817044734.jpg"
   ],
-  "updatedAt": 1789817022709
+  "updatedAt": 1789817044734
 }
