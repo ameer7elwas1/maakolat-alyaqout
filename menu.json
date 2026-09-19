@@ -245,13 +245,17 @@
     },
     {
       "id": "qatayef",
-      "category": "sweets",
       "name": "قطايف بالقشطة",
       "desc": "10 قطع.",
-      "price": 8000,
+      "category": "sweets",
+      "extrasKey": "sweet",
+      "extraIds": [
+        "sweetSofra",
+        "box"
+      ],
+      "image": "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/qatayef-1789816939348.jpg?v=1789816939348",
       "unit": "10 قطع",
-      "image": "assets/qatayef.jpg",
-      "extrasKey": "sweet"
+      "price": 8000
     },
     {
       "id": "grilled-fish",
@@ -301,7 +305,8 @@
     "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/grilled-fish.jpg",
     "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/kabsa-1789568859080.jpg",
     "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/pastry-mix.jpg",
-    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/qatayef-1789569051970.jpg?v=1789569051970"
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/qatayef-1789569051970.jpg?v=1789569051970",
+    "assets/uploads/qatayef-1789816939348.jpg"
   ],
-  "updatedAt": 1789816829568
+  "updatedAt": 1789816939348
 }
