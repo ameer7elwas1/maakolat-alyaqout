@@ -18,7 +18,7 @@
       document.documentElement.setAttribute("data-theme", theme);
     })();
   </script>
-  <link rel="stylesheet" href="css/style.css?v=24" />
+  <link rel="stylesheet" href="css/style.css?v=25" />
 </head>
 <body>
   <div class="page-bg" aria-hidden="true"></div>
@@ -39,7 +39,7 @@
 
       <nav class="header-nav" aria-label="التنقل الرئيسي">
         <a href="#menu">القائمة</a>
-        <a href="#featured">توقيعنا</a>
+        <a href="#special-order">طلب خاص</a>
         <a href="#about">من نحن</a>
         <a href="#contact">تواصل</a>
       </nav>
@@ -72,7 +72,7 @@
           <p class="hero-lead">كبة، دولمة، معجنات وحلويات تتحضّر بعناية. اختَر صنفك، حدّد الإضافات، وأرسل الطلب مباشرة إلى واتسابنا.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#menu">اطلب من القائمة</a>
-            <a class="btn btn-ghost" href="#about">من نحن</a>
+            <a class="btn btn-ghost" href="#special-order">طلب أكل خاص</a>
           </div>
           <ul class="hero-points">
             <li>تصفح المأكولات</li>
@@ -148,6 +148,40 @@
       </div>
     </section>
 
+    <section class="special-section" id="special-order">
+      <div class="container special-wrap">
+        <div class="special-intro">
+          <p class="eyebrow">CUSTOM ORDER</p>
+          <h2>طلب أكل خاص</h2>
+          <p>إذا ما لقيت طلبك في القائمة، اكتب لنا الأكل كما تريده. نراجع التفاصيل، نؤكد الكمية والسعر عبر واتساب، ثم نجهّزه حسب طلبك.</p>
+          <ol class="special-steps">
+            <li><strong>اكتب طلبك</strong><span>نوع الأكل، الكمية، وأي تفاصيل مهمة.</span></li>
+            <li><strong>نراجع معك</strong><span>نتواصل عبر واتساب لتأكيد الإمكانية والسعر.</span></li>
+            <li><strong>التحضير</strong><span>بعد التأكيد نبدأ التجهيز لوقت التسليم.</span></li>
+          </ol>
+          <p class="muted special-note">السعر يظهر حسب الكمية والمكونات، ويُؤكد قبل التحضير. يُفضّل الطلب قبل الموعد بوقت كافٍ خاصة للعزائم.</p>
+        </div>
+        <form class="special-card" id="special-form">
+          <p class="eyebrow">اكتب طلبك هنا</p>
+          <h3 id="special-form-title">أكل غير موجود في القائمة</h3>
+          <label>ماذا تريد أن نحضّر؟
+            <textarea name="desc" rows="4" required placeholder="مثال: صينية كبة لـ 10 أشخاص، أو أكل بمواصفات خاصة للمناسبة..."></textarea>
+          </label>
+          <label>الكمية / عدد الأشخاص
+            <input name="servings" type="text" placeholder="مثال: لـ 8 أشخاص، صينيتان، 3 كيلو..." />
+          </label>
+          <label>المناسبة (اختياري)
+            <input name="occasion" type="text" placeholder="سفرة بيت، عزيمة، مناسبة..." />
+          </label>
+          <label>ملاحظات إضافية
+            <textarea name="note" rows="2" placeholder="وقت التسليم، ملاحظات على المذاق أو التقديم..."></textarea>
+          </label>
+          <button class="btn btn-primary btn-block" id="special-submit" type="submit">أضف الطلب الخاص إلى السلة</button>
+          <p class="muted special-foot">يُضاف إلى السلة ثم تكمل الطلب كالعادة مع الموقع والخبز.</p>
+        </form>
+      </div>
+    </section>
+
     <section class="about-section" id="about">
       <div class="container about-grid">
         <div>
@@ -184,7 +218,7 @@
           <small>طلب سهل · توصيل عبر واتساب</small>
         </span>
       </div>
-      <p> الأصناف ذات السعر «حسب الكمية» تُحدَّد عند تأكيد الطلب. <a class="muted" href="admin.html?v=24">إدارة</a></p>
+      <p> الأصناف ذات السعر «حسب الكمية» تُحدَّد عند تأكيد الطلب. <a class="muted" href="admin.html?v=25">إدارة</a></p>
     </div>
   </footer>
 
@@ -277,9 +311,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/config.js?v=24"></script>
-  <script src="js/menu-data.js?v=24"></script>
-  <script src="js/menu-store.js?v=24"></script>
-  <script src="js/app.js?v=24"></script>
+  <script src="js/config.js?v=25"></script>
+  <script src="js/menu-data.js?v=25"></script>
+  <script src="js/menu-store.js?v=25"></script>
+  <script src="js/app.js?v=25"></script>
 </body>
 </html>

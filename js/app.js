@@ -317,7 +317,7 @@
     }
 
     els.cartItems.innerHTML = cart.map((item, idx) => `
-      <div class="cart-item">
+      <div class="cart-item${item.custom ? " is-custom" : ""}">
         <div class="cart-item-top">
           <h4>${item.name}</h4>
           <div class="cart-item-actions">
@@ -326,14 +326,14 @@
           </div>
         </div>
         <div>${item.variant || ""}</div>
-        <div class="extras">${item.extras.join(" · ") || "بدون إضافات"}</div>
+        <div class="extras">${(item.extras || []).join(" · ") || "بدون إضافات"}</div>
         <div class="cart-item-foot">
-          <div class="cart-qty">
+          ${item.custom ? `<span class="muted">يُؤكد السعر عبر واتساب</span>` : `<div class="cart-qty">
             <button type="button" data-cart-qty="${idx}" data-dir="-" aria-label="إنقاص الكمية">−</button>
             <strong>${item.qty}</strong>
             <button type="button" data-cart-qty="${idx}" data-dir="+" aria-label="زيادة الكمية">+</button>
-          </div>
-          <div class="price">${item.qty} × ${item.price == null ? "حسب الكمية" : money(item.price)}</div>
+          </div>`}
+          <div class="price">${item.price == null ? "حسب الكمية" : `${item.qty} × ${money(item.price)}`}</div>
         </div>
       </div>
     `).join("");
@@ -354,6 +354,16 @@
 
   function editCartItem(idx) {
     const line = cart[idx];
+    if (line && line.custom) {
+      editingCartIndex = idx;
+      fillSpecialForm(line);
+      closeModals();
+      editingCartIndex = idx;
+      const section = document.getElementById("special-order");
+      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+      toast("عدّل الطلب الخاص ثم احفظه");
+      return;
+    }
     const item = line && menu.find((i) => i.id === line.id);
     if (!item) {
       toast("تعذر تعديل هذا الصنف");
@@ -363,6 +373,56 @@
     els.cartDrawer.classList.remove("open");
     els.cartDrawer.setAttribute("aria-hidden", "true");
     openItem(item, line);
+  }
+
+  function specialEntryFromForm(form) {
+    const desc = String(form.desc.value || "").trim();
+    const servings = String(form.servings.value || "").trim();
+    const occasion = String(form.occasion.value || "").trim();
+    const note = String(form.note.value || "").trim();
+    const extras = [];
+    extras.push(desc);
+    if (servings) extras.push("الكمية: " + servings);
+    if (occasion) extras.push("المناسبة: " + occasion);
+    if (note) extras.push("ملاحظة: " + note);
+    return {
+      id: "custom-" + Date.now(),
+      name: "أكل خاص",
+      variant: occasion,
+      extras,
+      extraState: {},
+      note,
+      custom: true,
+      customDesc: desc,
+      customServings: servings,
+      customOccasion: occasion,
+      qty: 1,
+      step: 1,
+      price: null
+    };
+  }
+
+  function fillSpecialForm(line) {
+    const form = document.getElementById("special-form");
+    if (!form) return;
+    form.desc.value = line.customDesc || "";
+    form.servings.value = line.customServings || "";
+    form.occasion.value = line.customOccasion || "";
+    form.note.value = line.note || "";
+    const title = document.getElementById("special-form-title");
+    const btn = document.getElementById("special-submit");
+    if (title) title.textContent = "تعديل الطلب الخاص";
+    if (btn) btn.textContent = "حفظ الطلب الخاص";
+  }
+
+  function resetSpecialForm() {
+    const form = document.getElementById("special-form");
+    if (!form) return;
+    form.reset();
+    const title = document.getElementById("special-form-title");
+    const btn = document.getElementById("special-submit");
+    if (title) title.textContent = "أكل غير موجود في القائمة";
+    if (btn) btn.textContent = "أضف الطلب الخاص إلى السلة";
   }
 
   function addToCart(item, form) {
@@ -461,10 +521,19 @@
     ].filter((x, i, arr) => x !== "" || arr[i - 1] !== "");
 
     cart.forEach((item, i) => {
+      if (item.custom) {
+        lines.push(`${i + 1}) أكل خاص`);
+        if (item.customDesc) lines.push(`   الوصف: ${item.customDesc}`);
+        if (item.customServings) lines.push(`   الكمية: ${item.customServings}`);
+        if (item.customOccasion) lines.push(`   المناسبة: ${item.customOccasion}`);
+        if (item.note) lines.push(`   ملاحظة: ${item.note}`);
+        lines.push("   السعر: يُؤكد عبر واتساب");
+        return;
+      }
       lines.push(`${i + 1}) ${item.name}`);
       if (item.variant) lines.push(`   النوع: ${item.variant}`);
       lines.push(`   الكمية: ${item.qty}`);
-      if (item.extras.length) lines.push(`   الإضافات: ${item.extras.join("، ")}`);
+      if (item.extras && item.extras.length) lines.push(`   الإضافات: ${item.extras.join("، ")}`);
       lines.push(`   السعر: ${item.price == null ? "حسب الكمية" : money(item.price)}`);
     });
     lines.push("", `المجموع التقريبي: ${money(cartSum())}`);
@@ -529,6 +598,31 @@
         if (!btn) return;
         const item = menu.find((i) => i.id === btn.dataset.add);
         if (item) openItem(item);
+      });
+    }
+
+    const specialForm = document.getElementById("special-form");
+    if (specialForm) {
+      specialForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const entry = specialEntryFromForm(specialForm);
+        if (!entry.customDesc) {
+          toast("اكتب وصف الأكل الخاص أولاً");
+          return;
+        }
+        const wasEdit = editingCartIndex != null && cart[editingCartIndex] && cart[editingCartIndex].custom;
+        if (wasEdit) {
+          entry.id = cart[editingCartIndex].id;
+          cart[editingCartIndex] = entry;
+        } else {
+          cart.push(entry);
+        }
+        editingCartIndex = null;
+        saveCart();
+        renderCart();
+        resetSpecialForm();
+        toast(wasEdit ? "تم تعديل الطلب الخاص في السلة" : "تمت إضافة الطلب الخاص إلى السلة");
+        openCart();
       });
     }
 
