@@ -77,6 +77,15 @@
     return sessionStorage.getItem(SESSION) === "1";
   }
 
+  function showFileOriginHint() {
+    const hint = document.getElementById("file-origin-hint");
+    if (!hint) return;
+    const fileOrigin = window.MenuStore && window.MenuStore.isFileOrigin
+      ? window.MenuStore.isFileOrigin()
+      : (location.protocol === "file:");
+    hint.hidden = !fileOrigin;
+  }
+
   function showApp() {
     loginScreen.hidden = true;
     adminApp.hidden = false;
@@ -431,6 +440,7 @@
   });
 
   async function init() {
+    showFileOriginHint();
     catalog = window.MenuStore.load();
     if (isAuthed()) showApp();
     else showLogin();

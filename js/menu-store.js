@@ -139,8 +139,18 @@ window.MenuStore = {
       updatedAt: Math.max(Number(remote.updatedAt || 0), Number(local.updatedAt || 0))
     };
   },
+  isFileOrigin() {
+    try {
+      return location.protocol === "file:";
+    } catch (err) {
+      return false;
+    }
+  },
   utf8ToBase64(text) {
     return btoa(unescape(encodeURIComponent(text)));
+  },
+  base64ToUtf8(b64) {
+    return decodeURIComponent(escape(atob(String(b64 || "").replace(/\s/g, ""))));
   },
   async dataUrlToBase64(dataUrl) {
     const res = await fetch(dataUrl);
@@ -178,15 +188,25 @@ window.MenuStore = {
     }
   },
   async loadFileCatalog() {
+    if (this.isFileOrigin()) return null;
     try {
       return this.normalize(await this.fetchJson("menu.json", 5000));
     } catch (err) {
-      console.warn("MenuStore.loadFileCatalog", err);
+      return null;
+    }
+  },
+  async loadGithubCatalog() {
+    try {
+      const meta = await this.getFileMeta("menu.json");
+      if (!meta || !meta.content) return null;
+      return this.normalize(JSON.parse(this.base64ToUtf8(meta.content)));
+    } catch (err) {
+      console.warn("MenuStore.loadGithubCatalog", err);
       return null;
     }
   },
   async loadRemote() {
-    return this.loadFileCatalog();
+    return (await this.loadFileCatalog()) || (await this.loadGithubCatalog());
   },
   mediaUrl(src, cacheBust) {
     const fallback = "assets/pastry-mix.jpg";
