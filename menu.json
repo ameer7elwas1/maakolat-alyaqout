@@ -35,10 +35,8 @@
       "name": "لحم بعجين وميني بيتزا وفطائر",
       "desc": "تشكيلة 50 قطعة، مناسبة للضيافة.",
       "category": "pastry",
-      "extrasKey": "custom",
-      "extraIds": [
-        "box"
-      ],
+      "extrasKey": "none",
+      "extraIds": [],
       "image": "assets/pastry-mix.jpg",
       "unit": "50 قطعة",
       "price": 35000
@@ -289,7 +287,19 @@
     "assets/cake-layer.jpg",
     "assets/qatayef.jpg",
     "assets/grilled-fish.jpg",
-    "assets/qouzi.jpg"
+    "assets/qouzi.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/dish-1789491571122.jpg?v=1789492215798",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/dish-1789486426354.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/dish-1789486426354.jpg?v=1789499686583",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/dish-1789491571122.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/qatayef-1789569051970.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/chicken-tray.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/dish-1789486426354-1789568916960.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/grilled-fish-1789567138608.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/grilled-fish.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/kabsa-1789568859080.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/pastry-mix.jpg",
+    "https://raw.githubusercontent.com/ameer7elwas1/maakolat-alyaqout/main/assets/uploads/qatayef-1789569051970.jpg?v=1789569051970"
   ],
-  "updatedAt": 1789815700005
+  "updatedAt": 1789816704612
 }
