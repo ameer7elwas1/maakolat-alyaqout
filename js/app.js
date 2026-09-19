@@ -210,7 +210,7 @@
       </div>
       ${extraFields}
       <label>ملاحظات على هذا الصنف
-        <textarea name="note" rows="2" placeholder="مثال: توصيل الساعة 7..."></textarea>
+        <textarea name="note" rows="2" placeholder="مثال: خبز نعم/لا، توصيل الساعة 7..."></textarea>
       </label>
       <button class="btn btn-primary btn-block" type="submit">إضافة إلى السلة</button>
     `;
@@ -356,6 +356,7 @@
       `العنوان: ${data.address}`,
       data.locationUrl ? `الموقع على الخريطة: ${data.locationUrl}` : "الموقع: لم يُحدَّد",
       `الاستلام: ${data.fulfillment}`,
+      `خبز: ${data.bread || "لم يُحدَّد"}`,
       data.notes ? `ملاحظات: ${data.notes}` : "",
       "",
       "الطلب:"
@@ -501,11 +502,17 @@
         return;
       }
       const form = new FormData(els.checkoutForm);
+      const bread = String(form.get("bread") || "").trim();
+      if (!bread) {
+        toast("حدّد إذا كنت تريد خبزاً مع الطلب أو لا");
+        return;
+      }
       sendWhatsapp({
         name: form.get("name").trim(),
         phone: form.get("phone").trim(),
         address: form.get("address").trim(),
         fulfillment: form.get("fulfillment"),
+        bread,
         notes: form.get("notes").trim(),
         locationUrl: customerLocation.url
       });

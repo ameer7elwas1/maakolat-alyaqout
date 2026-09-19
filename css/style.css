@@ -619,7 +619,14 @@ input[type="text"], input[type="tel"], textarea, select {
   margin-bottom: 16px;
   color: var(--muted);
 }
-.muted { color: var(--muted); }
+.field-hint {
+  display: block;
+  font-weight: 500;
+  font-size: 0.86rem;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+.bread-choice { margin-top: 4px; }
 .location-box {
   background: var(--field);
   border: 1px solid var(--line);

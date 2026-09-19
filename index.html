@@ -18,7 +18,7 @@
       document.documentElement.setAttribute("data-theme", theme);
     })();
   </script>
-  <link rel="stylesheet" href="css/style.css?v=22" />
+  <link rel="stylesheet" href="css/style.css?v=23" />
 </head>
 <body>
   <div class="page-bg" aria-hidden="true"></div>
@@ -184,7 +184,7 @@
           <small>طلب سهل · توصيل عبر واتساب</small>
         </span>
       </div>
-      <p> الأصناف ذات السعر «حسب الكمية» تُحدَّد عند تأكيد الطلب. <a class="muted" href="admin.html?v=22">إدارة</a></p>
+      <p> الأصناف ذات السعر «حسب الكمية» تُحدَّد عند تأكيد الطلب. <a class="muted" href="admin.html?v=23">إدارة</a></p>
     </div>
   </footer>
 
@@ -259,8 +259,14 @@
             <legend>طريقة الاستلام</legend>
             <label class="chip"><input type="radio" name="fulfillment" value="توصيل" checked /> توصيل</label>
           </fieldset>
+          <fieldset class="choice-row bread-choice">
+            <legend>هل تريد خبزاً مع الطلب؟</legend>
+            <label class="chip"><input type="radio" name="bread" value="نعم" required /> نعم، مع خبز</label>
+            <label class="chip"><input type="radio" name="bread" value="لا" /> لا، بدون خبز</label>
+          </fieldset>
           <label>ملاحظات عامة
-            <textarea name="notes" rows="3" placeholder="وقت التوصيل، تعليمات إضافية..."></textarea>
+            <span class="field-hint">تلميح: اذكر إذا كنت تريد خبزاً أو لا، وأي تفاصيل أخرى للطلب.</span>
+            <textarea name="notes" rows="3" placeholder="خبز: نعم أو لا — وقت التوصيل، تعليمات إضافية..."></textarea>
           </label>
           <div class="checkout-summary" id="checkout-summary"></div>
           <button class="btn btn-primary btn-block" type="submit">إرسال الطلب عبر واتساب</button>
@@ -271,9 +277,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/config.js?v=22"></script>
-  <script src="js/menu-data.js?v=22"></script>
-  <script src="js/menu-store.js?v=22"></script>
-  <script src="js/app.js?v=22"></script>
+  <script src="js/config.js?v=23"></script>
+  <script src="js/menu-data.js?v=23"></script>
+  <script src="js/menu-store.js?v=23"></script>
+  <script src="js/app.js?v=23"></script>
 </body>
 </html>
