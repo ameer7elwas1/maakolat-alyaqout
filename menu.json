@@ -32,13 +32,14 @@
   "menu": [
     {
       "id": "pastry-mix",
-      "category": "pastry",
       "name": "لحم بعجين وميني بيتزا وفطائر",
       "desc": "تشكيلة 50 قطعة، مناسبة للضيافة.",
-      "price": 35000,
-      "unit": "50 قطعة",
+      "category": "pastry",
+      "extrasKey": "none",
+      "extraIds": [],
       "image": "assets/pastry-mix.jpg",
-      "extrasKey": "savory"
+      "unit": "50 قطعة",
+      "price": 35000
     },
     {
       "id": "rice-kibbeh-mix",
@@ -288,5 +289,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789815378377
+  "updatedAt": 1789815440587
 }
