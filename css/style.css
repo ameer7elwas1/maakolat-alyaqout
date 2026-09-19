@@ -482,6 +482,41 @@ body:has(.modal.open) .mobile-bar {
   gap: 8px;
   align-items: start;
 }
+.cart-item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.cart-edit {
+  background: transparent;
+  border: 0;
+  color: var(--ruby);
+  cursor: pointer;
+  font-weight: 700;
+}
+.cart-item-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.cart-qty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  direction: ltr;
+}
+.cart-qty button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--field);
+  color: var(--ink);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
 .remove-item {
   background: transparent;
   border: 0;

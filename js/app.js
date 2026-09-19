@@ -37,6 +37,7 @@
 
   let currentCategory = "all";
   let searchQuery = "";
+  let editingCartIndex = null;
   let activeItem = null;
   let qty = 1;
   let customerLocation = null;
@@ -174,6 +175,56 @@
     return chosen;
   }
 
+  function extraStateFromForm(item, form) {
+    const state = {};
+    Object.entries(item.extras || {}).forEach(([key, extra]) => {
+      if (extra.type === "radio") {
+        const val = form.querySelector(`[name="${key}"]:checked`);
+        state[key] = val ? val.value : "";
+      } else {
+        state[key] = !!form.querySelector(`[name="${key}"]`)?.checked;
+      }
+    });
+    return state;
+  }
+
+  function applyCartLineToForm(item, line) {
+    const form = els.itemForm;
+    if (!form || !line) return;
+    if (item.variants) {
+      const vid = line.variantId || ((item.variants.find((v) => v.label === line.variant) || {}).id);
+      const radio = vid ? form.querySelector(`[name="variant"][value="${vid}"]`) : null;
+      if (radio) radio.checked = true;
+    }
+    const state = line.extraState || {};
+    Object.entries(item.extras || {}).forEach(([key, extra]) => {
+      if (extra.type === "radio") {
+        const el = state[key] ? form.querySelector(`[name="${key}"][value="${state[key]}"]`) : null;
+        if (el) el.checked = true;
+        return;
+      }
+      const box = form.querySelector(`[name="${key}"]`);
+      if (!box) return;
+      if (Object.prototype.hasOwnProperty.call(state, key)) box.checked = !!state[key];
+      else if (Array.isArray(line.extras)) box.checked = line.extras.indexOf(extra.label) >= 0;
+    });
+    const noteEl = form.querySelector("[name=note]");
+    if (noteEl) {
+      if (line.note) noteEl.value = line.note;
+      else if (Array.isArray(line.extras)) {
+        const found = line.extras.find((x) => String(x).indexOf("ملاحظة:") === 0);
+        if (found) noteEl.value = String(found).replace(/^ملاحظة:\s*/, "");
+      }
+    }
+    qty = Number(line.qty) || 1;
+    const step = item.step || 1;
+    if (step < 1) qty = Math.round(qty * 10) / 10;
+    const qtyEl = document.getElementById("qty-val");
+    if (qtyEl) qtyEl.textContent = qty;
+    const submit = form.querySelector('[type="submit"]');
+    if (submit) submit.textContent = "حفظ التعديل";
+  }
+
   function renderItemForm(item) {
     qty = item.step ? 1 : 1;
     const variants = item.variants
@@ -216,7 +267,8 @@
     `;
   }
 
-  function openItem(item) {
+  function openItem(item, cartLine) {
+    if (!cartLine) editingCartIndex = null;
     activeItem = item;
     els.itemTitle.textContent = item.name;
     els.itemDesc.textContent = item.desc;
@@ -224,6 +276,7 @@
     els.itemHero.style.backgroundSize = "cover";
     els.itemHero.style.backgroundPosition = "center";
     renderItemForm(item);
+    if (cartLine) applyCartLineToForm(item, cartLine);
     els.itemModal.classList.add("open");
     els.itemModal.setAttribute("aria-hidden", "false");
     els.overlay.hidden = false;
@@ -267,30 +320,75 @@
       <div class="cart-item">
         <div class="cart-item-top">
           <h4>${item.name}</h4>
-          <button class="remove-item" data-remove="${idx}" type="button">حذف</button>
+          <div class="cart-item-actions">
+            <button class="cart-edit" type="button" data-edit="${idx}">تعديل</button>
+            <button class="remove-item" data-remove="${idx}" type="button">حذف</button>
+          </div>
         </div>
         <div>${item.variant || ""}</div>
         <div class="extras">${item.extras.join(" · ") || "بدون إضافات"}</div>
-        <div class="price">${item.qty} × ${item.price == null ? "حسب الكمية" : money(item.price)}</div>
+        <div class="cart-item-foot">
+          <div class="cart-qty">
+            <button type="button" data-cart-qty="${idx}" data-dir="-" aria-label="إنقاص الكمية">−</button>
+            <strong>${item.qty}</strong>
+            <button type="button" data-cart-qty="${idx}" data-dir="+" aria-label="زيادة الكمية">+</button>
+          </div>
+          <div class="price">${item.qty} × ${item.price == null ? "حسب الكمية" : money(item.price)}</div>
+        </div>
       </div>
     `).join("");
   }
 
+  function changeCartQty(idx, dir) {
+    const line = cart[idx];
+    if (!line) return;
+    const catalogItem = menu.find((i) => i.id === line.id);
+    const step = line.step || (catalogItem && catalogItem.step) || 1;
+    let next = Number(line.qty || 0) + (dir === "+" ? step : -step);
+    next = Math.max(step, next);
+    if (step < 1) next = Math.round(next * 10) / 10;
+    line.qty = next;
+    saveCart();
+    renderCart();
+  }
+
+  function editCartItem(idx) {
+    const line = cart[idx];
+    const item = line && menu.find((i) => i.id === line.id);
+    if (!item) {
+      toast("تعذر تعديل هذا الصنف");
+      return;
+    }
+    editingCartIndex = idx;
+    els.cartDrawer.classList.remove("open");
+    els.cartDrawer.setAttribute("aria-hidden", "true");
+    openItem(item, line);
+  }
+
   function addToCart(item, form) {
-    const variant = selectedVariantLabel(item, form);
-    const extras = extrasFromForm(item, form);
-    cart.push({
+    const note = form.querySelector("[name=note]")?.value.trim() || "";
+    const variantInput = item.variants ? form.querySelector("[name=variant]:checked") : null;
+    const entry = {
       id: item.id,
       name: item.name,
-      variant,
-      extras,
+      variant: selectedVariantLabel(item, form),
+      variantId: variantInput ? variantInput.value : "",
+      extras: extrasFromForm(item, form),
+      extraState: extraStateFromForm(item, form),
+      note,
       qty,
+      step: item.step || 1,
       price: selectedPrice(item, form)
-    });
+    };
+    const wasEdit = editingCartIndex != null && cart[editingCartIndex];
+    if (wasEdit) cart[editingCartIndex] = entry;
+    else cart.push(entry);
+    editingCartIndex = null;
     saveCart();
     renderCart();
     closeModals();
-    toast("تمت إضافة الصنف إلى السلة");
+    if (wasEdit) openCart();
+    toast(wasEdit ? "تم تعديل الطلب في السلة" : "تمت إضافة الصنف إلى السلة");
   }
 
   function mapsUrl(lat, lng) {
@@ -466,14 +564,53 @@
       document.getElementById(id).addEventListener("click", openCart);
     });
     document.getElementById("close-cart").addEventListener("click", closeModals);
-    document.getElementById("close-item").addEventListener("click", closeModals);
+    document.getElementById("close-item").addEventListener("click", () => {
+      if (editingCartIndex != null) {
+        els.itemModal.classList.remove("open");
+        els.itemModal.setAttribute("aria-hidden", "true");
+        editingCartIndex = null;
+        openCart();
+        return;
+      }
+      closeModals();
+    });
     document.getElementById("close-checkout").addEventListener("click", closeModals);
-    els.overlay.addEventListener("click", closeModals);
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModals(); });
+    els.overlay.addEventListener("click", () => {
+      if (els.itemModal.classList.contains("open") && editingCartIndex != null) {
+        els.itemModal.classList.remove("open");
+        els.itemModal.setAttribute("aria-hidden", "true");
+        editingCartIndex = null;
+        openCart();
+        return;
+      }
+      closeModals();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      if (els.itemModal.classList.contains("open") && editingCartIndex != null) {
+        els.itemModal.classList.remove("open");
+        els.itemModal.setAttribute("aria-hidden", "true");
+        editingCartIndex = null;
+        openCart();
+        return;
+      }
+      closeModals();
+    });
 
     els.cartItems.addEventListener("click", (e) => {
-      if (e.target.dataset.remove == null) return;
-      cart.splice(Number(e.target.dataset.remove), 1);
+      const editBtn = e.target.closest("[data-edit]");
+      const qtyBtn = e.target.closest("[data-cart-qty]");
+      const removeBtn = e.target.closest("[data-remove]");
+      if (editBtn) {
+        editCartItem(Number(editBtn.dataset.edit));
+        return;
+      }
+      if (qtyBtn) {
+        changeCartQty(Number(qtyBtn.dataset.cartQty), qtyBtn.dataset.dir);
+        return;
+      }
+      if (!removeBtn) return;
+      cart.splice(Number(removeBtn.dataset.remove), 1);
       saveCart();
       renderCart();
     });
