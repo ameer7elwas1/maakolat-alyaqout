@@ -35,8 +35,10 @@
       "name": "لحم بعجين وميني بيتزا وفطائر",
       "desc": "تشكيلة 50 قطعة، مناسبة للضيافة.",
       "category": "pastry",
-      "extrasKey": "none",
-      "extraIds": [],
+      "extrasKey": "custom",
+      "extraIds": [
+        "box"
+      ],
       "image": "assets/pastry-mix.jpg",
       "unit": "50 قطعة",
       "price": 35000
@@ -289,5 +291,5 @@
     "assets/grilled-fish.jpg",
     "assets/qouzi.jpg"
   ],
-  "updatedAt": 1789815440587
+  "updatedAt": 1789815700005
 }
