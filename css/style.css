@@ -833,11 +833,26 @@ input[type="text"], input[type="tel"], textarea, select {
 .admin-image-preview[hidden] { display: none; }
 .admin-dish strong { display: block; margin-bottom: 4px; }
 .admin-dish-actions { display: flex; gap: 8px; }
-.admin-variants {
+.admin-variants,
+.admin-extras {
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 12px;
   margin: 8px 0 16px;
+}
+.admin-extras legend,
+.admin-variants legend {
+  font-weight: 800;
+  padding: 0 6px;
+}
+.admin-extra-add {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-top: 8px;
+}
+.admin-extra-row [data-remove-extra] {
+  flex-shrink: 0;
 }
 .admin-variant-row {
   display: grid;

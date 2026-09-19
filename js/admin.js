@@ -152,7 +152,7 @@
     form.name.value = item ? item.name : "";
     form.desc.value = item ? item.desc || "" : "";
     form.category.value = item ? item.category : (catalog.categories.find((c) => c.id !== "all") || {}).id || "";
-    form.extrasKey.value = item ? (item.extrasKey || "savory") : "savory";
+    renderExtraChecks(item);
     const rawImage = item ? String(item.image || "") : "";
     const pathOnly = imageKey(rawImage);
     const matchOpt = [...form.image.options].find((o) => o.value && (o.value === rawImage || o.value === pathOnly));
@@ -175,6 +175,66 @@
     modal.setAttribute("aria-hidden", "true");
     overlay.hidden = true;
     document.body.style.overflow = "";
+  }
+
+  function extraCheckRow(id, label, checked, custom) {
+    const wrap = document.createElement("label");
+    wrap.className = "toggle-extra admin-extra-row";
+    wrap.innerHTML = `
+      <input type="checkbox" data-extra-id="${esc(id)}" ${checked ? "checked" : ""} ${custom ? 'data-custom="1"' : ""} />
+      <span>${esc(label)}</span>
+      ${custom ? '<button type="button" class="remove-item" data-remove-extra>إزالة</button>' : ""}
+    `;
+    const btn = wrap.querySelector("[data-remove-extra]");
+    if (btn) {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        wrap.remove();
+      });
+    }
+    return wrap;
+  }
+
+  function renderExtraChecks(item) {
+    const box = document.getElementById("extra-checks");
+    if (!box) return;
+    box.innerHTML = "";
+    const defs = (window.YAM_DEFAULT && window.YAM_DEFAULT.extraOptions) || {};
+    const selected = (typeof window.YAM_EXTRA_IDS === "function")
+      ? window.YAM_EXTRA_IDS(item || { extrasKey: item ? item.extrasKey : "none" })
+      : [];
+    const custom = (item && item.customExtras) || {};
+    Object.keys(defs).forEach((id) => {
+      box.appendChild(extraCheckRow(id, defs[id].label, selected.indexOf(id) >= 0, false));
+    });
+    selected.forEach((id) => {
+      if (defs[id]) return;
+      const label = (custom[id] && custom[id].label) || id;
+      box.appendChild(extraCheckRow(id, label, true, true));
+    });
+  }
+
+  function collectExtras() {
+    const extraIds = [];
+    const customExtras = {};
+    document.querySelectorAll("#extra-checks [data-extra-id]").forEach((input) => {
+      if (!input.checked) return;
+      const id = input.getAttribute("data-extra-id");
+      extraIds.push(id);
+      if (input.getAttribute("data-custom") === "1") {
+        const span = (input.closest("label") || {}).querySelector("span");
+        customExtras[id] = { type: "toggle", label: span ? span.textContent.trim() : id };
+      }
+    });
+    return { extraIds, customExtras };
+  }
+
+  function extrasKeyFromIds(ids) {
+    const groups = (window.YAM_DEFAULT && window.YAM_DEFAULT.extraGroups) || {};
+    const norm = (arr) => (arr || []).slice().sort().join("|");
+    const target = norm(ids);
+    const found = Object.keys(groups).find((k) => norm(groups[k]) === target);
+    return found || (ids.length ? "custom" : "none");
   }
 
   function collectVariants() {
@@ -226,6 +286,18 @@
 
   document.getElementById("add-variant").addEventListener("click", () => {
     variantRows.appendChild(variantRow());
+  });
+
+  document.getElementById("add-custom-extra").addEventListener("click", () => {
+    const input = document.getElementById("custom-extra-label");
+    const label = input ? input.value.trim() : "";
+    if (!label) {
+      toast("اكتب اسم المربع أولاً");
+      return;
+    }
+    const box = document.getElementById("extra-checks");
+    if (box) box.appendChild(extraCheckRow("x" + Date.now(), label, true, true));
+    if (input) input.value = "";
   });
 
   document.getElementById("reset-menu").addEventListener("click", async () => {
@@ -298,18 +370,21 @@
       toast("اختَر صورة أو أدخل رابطاً");
       return;
     }
+    const extras = collectExtras();
     const item = {
       id: form.id.value || `dish-${Date.now()}`,
       name: form.name.value.trim(),
       desc: form.desc.value.trim(),
       category: form.category.value,
-      extrasKey: form.extrasKey.value,
+      extrasKey: extrasKeyFromIds(extras.extraIds),
+      extraIds: extras.extraIds,
       image,
       unit: form.unit.value.trim(),
       step: form.kilo.checked ? 0.5 : undefined,
       price: variants.length ? undefined : (priceRaw === "" ? null : Number(priceRaw)),
       variants: variants.length ? variants : undefined
     };
+    if (Object.keys(extras.customExtras).length) item.customExtras = extras.customExtras;
     if (uploaded) item._keepImage = previous;
     if (!item.step) delete item.step;
     if (!item.variants) delete item.variants;

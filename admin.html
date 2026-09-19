@@ -17,7 +17,7 @@
       document.documentElement.setAttribute("data-theme", theme);
     })();
   </script>
-  <link rel="stylesheet" href="css/style.css?v=25" />
+  <link rel="stylesheet" href="css/style.css?v=26" />
 </head>
 <body class="admin-page">
   <div class="page-bg" aria-hidden="true"></div>
@@ -89,15 +89,15 @@
           <label>التصنيف
             <select name="category" required></select>
           </label>
-          <label>الإضافات
-            <select name="extrasKey">
-              <option value="savory">سفرة وطرشي</option>
-              <option value="sweet">حلويات (سفرة وعلبة)</option>
-              <option value="grill">شوي (سفرة، طرشي، تمن، خضرة)</option>
-              <option value="chicken">صينية دجاج (سفرة وطرشي إضافي)</option>
-              <option value="none">بدون إضافات</option>
-            </select>
-          </label>
+          <fieldset class="admin-extras">
+            <legend>مربعات الإضافات لهذا الصنف فقط</legend>
+            <p class="muted">حدّد ما يظهر للزبون عند الطلب. يمكن إزالة الطرشي أو أي مربع من صنف معيّن دون أن يتأثر باقي الأصناف.</p>
+            <div id="extra-checks"></div>
+            <div class="admin-extra-add">
+              <input id="custom-extra-label" type="text" placeholder="مربع مخصص مثل: بدون بصل" />
+              <button class="btn btn-ghost" id="add-custom-extra" type="button">إضافة مربع</button>
+            </div>
+          </fieldset>
           <label>صورة جاهزة
             <select name="image"></select>
           </label>
@@ -133,9 +133,9 @@
   <div class="overlay" id="overlay" hidden></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/config.js?v=25"></script>
-  <script src="js/menu-data.js?v=25"></script>
-  <script src="js/menu-store.js?v=25"></script>
-  <script src="js/admin.js?v=25"></script>
+  <script src="js/config.js?v=26"></script>
+  <script src="js/menu-data.js?v=26"></script>
+  <script src="js/menu-store.js?v=26"></script>
+  <script src="js/admin.js?v=26"></script>
 </body>
 </html>

@@ -20,6 +20,22 @@ window.YAM_DEFAULT = {
     },
     none: {}
   },
+  extraOptions: {
+    sofra: { type: "toggle", label: "سفرة", hint: "تجهيز للسفرة والتقديم" },
+    pickles: { type: "toggle", label: "طرشي" },
+    extraPickles: { type: "toggle", label: "طرشي إضافي" },
+    rice: { type: "toggle", label: "تمن أحمر", checked: true },
+    greens: { type: "toggle", label: "خضرة" },
+    sweetSofra: { type: "toggle", label: "تجهيز للسفرة / تقديم ضيافة" },
+    box: { type: "toggle", label: "علبة مناسبة" }
+  },
+  extraGroups: {
+    savory: ["sofra", "pickles"],
+    sweet: ["sweetSofra", "box"],
+    grill: ["sofra", "pickles", "rice", "greens"],
+    chicken: ["sofra", "extraPickles"],
+    none: []
+  },
   categories: [
     { id: "all", label: "الكل" },
     { id: "pastry", label: "معجنات ومقبلات" },
@@ -67,4 +83,23 @@ window.YAM_DEFAULT = {
     { id: "grilled-fish", category: "special", name: "سمك شوي", desc: "مع التمن الأحمر والطرشي. السعر حسب الكمية.", price: null, image: "assets/grilled-fish.jpg", extrasKey: "grill" },
     { id: "qouzi", category: "special", name: "قوزي لحم", desc: "حسب الكمية المطلوبة للمناسبة.", price: null, image: "assets/qouzi.jpg", extrasKey: "savory" }
   ]
+};
+
+window.YAM_EXTRA_IDS = function (item) {
+  if (item && Array.isArray(item.extraIds)) return item.extraIds.slice();
+  const groups = (window.YAM_DEFAULT && window.YAM_DEFAULT.extraGroups) || {};
+  const key = item && item.extrasKey;
+  if (key && groups[key]) return groups[key].slice();
+  return [];
+};
+
+window.YAM_EXTRAS_FOR = function (item) {
+  const defs = (window.YAM_DEFAULT && window.YAM_DEFAULT.extraOptions) || {};
+  const custom = (item && item.customExtras) || {};
+  const extras = {};
+  window.YAM_EXTRA_IDS(item).forEach((id) => {
+    if (custom[id]) extras[id] = Object.assign({ type: "toggle" }, custom[id]);
+    else if (defs[id]) extras[id] = Object.assign({}, defs[id]);
+  });
+  return extras;
 };

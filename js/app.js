@@ -48,8 +48,9 @@
   const cartSum = () => cart.reduce((s, i) => s + (i.price || 0) * i.qty, 0);
 
   function hydrateItem(item) {
-    const presets = (window.YAM_DEFAULT && window.YAM_DEFAULT.extras) || {};
-    const extras = presets[item.extrasKey] || item.extras || {};
+    const extras = (typeof window.YAM_EXTRAS_FOR === "function")
+      ? window.YAM_EXTRAS_FOR(item)
+      : (((window.YAM_DEFAULT && window.YAM_DEFAULT.extras) || {})[item.extrasKey] || {});
     return Object.assign({}, item, { extras });
   }
 

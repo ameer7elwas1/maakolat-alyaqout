@@ -105,6 +105,8 @@ window.MenuStore = {
       unit: item.unit,
       step: item.step,
       extrasKey: item.extrasKey,
+      extraIds: item.extraIds || null,
+      customExtras: item.customExtras || null,
       variants: item.variants || null
     })));
   },
